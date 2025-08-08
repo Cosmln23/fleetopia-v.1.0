@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+html, body {
+  @apply bg-black text-gray-100 antialiased;
+}
+
+/* Glassmorphism helpers from guides */
+.glass-border { border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.02); }
+.glass-card { border: 1px solid rgba(255, 255, 255, 0.06); backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.03); }
+.glass-input { border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.04); }
+.glass-input:focus { border-color: rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.06); outline: none; }
+
+/* Animations from guides */
+/* Utility classes from MD specs */
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; }
+.modal.active { display: flex; align-items: center; justify-content: center; }
+.tab-active { color: #fff !important; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.settings-nav-active { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fff; }
+.level-active { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+.testimonial-slider { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.testimonial-slider::-webkit-scrollbar { display: none; }
+.testimonial-track { display: flex; gap: 1.5rem; width: max-content; padding: 0 1.5rem; }
+.fade-in { @apply animate-fade-in; }
+.slide-up { @apply animate-slide-up; }
+.slide-left { @apply animate-slide-left; }
+.slide-right { @apply animate-slide-right; }
+.blur-in { @apply animate-blur-in; }
+
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+.delay-900 { animation-delay: 0.9s; }
+.delay-1000 { animation-delay: 1s; }
+
+/* Helpers */
+.animate-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+.in-view { opacity: 1; transform: translateY(0); }

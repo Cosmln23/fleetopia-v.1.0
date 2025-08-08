@@ -1,0 +1,5 @@
+[
+  {"id":"001","driver":"John Smith","location":"Dallas, TX","type":"Dry Van","status":"active"},
+  {"id":"002","driver":"Mike Johnson","location":"Atlanta, GA","type":"Reefer","status":"active"},
+  {"id":"003","driver":"Sarah Wilson","location":"Phoenix, AZ","type":"Flatbed","status":"maintenance"}
+]

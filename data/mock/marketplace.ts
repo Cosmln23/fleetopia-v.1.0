@@ -1,0 +1,51 @@
+export type CargoCard = {
+  id: number;
+  title: string;
+  company: string;
+  price: string;
+  age: string;
+  from: string;
+  to: string;
+  type: string;
+  weight: string;
+  urgency: 'Low' | 'Medium' | 'High';
+};
+
+export const cargoList: CargoCard[] = [
+  {
+    id: 1,
+    title: 'Electronics Shipment',
+    company: 'TransCorp',
+    price: '€1,850',
+    age: '2 hours ago',
+    from: 'NL Amsterdam 1012',
+    to: 'DE Berlin 10115',
+    type: 'Pallets',
+    weight: '2,500 kg • 12.5 m³',
+    urgency: 'Medium',
+  },
+  {
+    id: 2,
+    title: 'Food & Beverages',
+    company: 'FoodLogistics',
+    price: '€3,200',
+    age: '5 hours ago',
+    from: 'DE Berlin 10115',
+    to: 'FR Paris 75001',
+    type: 'Container',
+    weight: '15,000 kg • 68.0 m³',
+    urgency: 'High',
+  },
+  {
+    id: 3,
+    title: 'Construction Materials',
+    company: 'BuildCorp',
+    price: '€2,750',
+    age: '1 day ago',
+    from: 'FR Paris 75001',
+    to: 'IT Rome 00118',
+    type: 'Bulk',
+    weight: '8,000 kg',
+    urgency: 'Low',
+  },
+];
