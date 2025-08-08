@@ -17,3 +17,8 @@ To‑Do (neimplementat)
 - Stripe: checkout session + webhook receiver + status sync job
 - UI: pages `settings/account`, `settings/notifications` separate, `SubscriptionGate.tsx`
 
+Prioritized TODO (acceptance criteria)
+- Clicking “Pick Basic/Agent” opens a Stripe checkout (test mode) and redirects back on success
+- Stripe webhook flips `User.plan` to `pro`; UI gates update instantly (no reload) via WS `subscription_changed`
+- GET/PUT /api/settings/general persists preferences; Notification test endpoint returns `sent: true`
+

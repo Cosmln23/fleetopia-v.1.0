@@ -21,3 +21,8 @@ To‑Do (neimplementat)
 - Conectare Home la backend autentic (GET `/api/home-data` cu auth → personalizează răspunsul)
 - Rute rapide: Post Cargo Fast → POST `/api/cargo/quick-post` (cu validare), Find Loads → `/api/loads/quick-search`, Track My Shipments → `/api/deals/active`
 
+Prioritized TODO (acceptance criteria)
+- Clerk mounted and user avatar/menu appears in `Header`; unauthenticated users see Sign in
+- GET /api/home-data returns personalized quickActions when authenticated; public fallback otherwise
+- Clicking Quick Actions triggers respective endpoints and navigations; failures show a toast
+

@@ -19,3 +19,11 @@ To‑Do (neimplementat)
 - WS events: `agent_suggestion_new`, `fleet_gps_update`, `fleet_status_change`, `ai_level_change`
 - UI: `AISuggestionsPanel`, `FleetManagementPanel` (MapInterface + VehicleGrid), thumbs up/down feedback
 
+Constraints (do-not-touch)
+- NU modifica `agent-core` (model/endpoint logic). Persistă doar input/output și afișarea în UI.
+
+Prioritized TODO (acceptance criteria)
+- Persist cost settings via PUT /api/cost-settings; subsequent GET returns saved values
+- L2 suggestions fetched via `/api/agent/suggest` are saved to `AIHistory` and rendered in feed after page reload
+- Fleet: POST /api/fleet/add creates a vehicle; GET /api/fleet/vehicles lists it; UI grid shows new vehicle without refresh via WS `fleet_status_change`
+

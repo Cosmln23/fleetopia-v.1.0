@@ -22,3 +22,10 @@ To‑Do (neimplementat)
 - Quote endpoints + integrare în UI modal (send/accept)
 - WS rooms: `all_offers_room`, `cargo_{id}`, `user_{id}`
 
+Prioritized TODO (acceptance criteria)
+- Components extraction completed and imported in `app/marketplace/page.tsx` (build passes; no regressions)
+- POST /api/cargo/create persists cargo and returns {cargoId}; cargo appears in MY CARGO after refresh
+- GET /api/marketplace/all-offers supports search, country, type, urgency, min/max, sort (at least 3 filters working server-side)
+- Quote flow: user can POST quote; owner sees it in GET quotes; owner can accept; a Deal record is created
+- Basic WS: when a cargo is created, ALL OFFERS grid updates without hard refresh (room `all_offers_room`)
+

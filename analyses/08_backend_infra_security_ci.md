@@ -18,3 +18,9 @@ To‑Do (neimplementat)
 - CI: workflows pentru lint/test/build, min test suite (Jest) + Playwright smoke
 - Observabilitate: Sentry/metrics; rate limits pe user și IP; CORS whitelist
 
+Prioritized TODO (acceptance criteria)
+- Clerk middleware protects private routes; unauthenticated gets 401 JSON with code
+- Prisma migration runs successfully and seeds minimal data; dev DB connected
+- GitHub Actions workflow runs lint+typecheck+build on PR; status must be green to merge
+- Global compression enabled; CORS restricted to frontend origin; Sentry DSN configurable
+
