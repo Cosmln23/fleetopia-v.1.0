@@ -468,7 +468,7 @@ export default function DispatcherPage() {
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {vehicles.map((v) => (
                           <div key={v.id} className="glass-border rounded-lg p-4 group" data-status={v.status}>
                             <div className="flex items-center justify-between mb-3">
@@ -585,8 +585,8 @@ export default function DispatcherPage() {
                   </div>
                 </div>
               ))}
-              </div>
             </div>
+          </div>
 
             {/* Total */}
             <div className="glass-border rounded-lg p-4">

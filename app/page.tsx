@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import { Package, Search, MapPin, ArrowRight, Star, PlayCircle, Zap } from 'lucide-react';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
