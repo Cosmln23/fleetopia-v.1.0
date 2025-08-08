@@ -1,12 +1,25 @@
 "use client";
 
 import Link from 'next/link';
-import { Bell, MessageCircle, User } from 'lucide-react';
+import { Bell, MessageCircle, User, Globe } from 'lucide-react';
 import { useI18nStore } from '@/store/useI18nStore';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Header() {
   const language = useI18nStore((s) => s.language);
   const setLanguage = useI18nStore((s) => s.setLanguage);
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
+  }, []);
+
   return (
     <header className="fixed top-0 w-full z-50 glass-border fade-in">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -21,20 +34,36 @@ export default function Header() {
             <Bell className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <button
-              className={`text-xs px-2 py-1 rounded ${language === 'en' ? 'text-white glass-border' : 'hover:text-white'}`}
-              onClick={() => setLanguage('en')}
-              aria-label="English"
-            >
-              EN
-            </button>
-            <button
-              className={`text-xs px-2 py-1 rounded ${language === 'ro' ? 'text-white glass-border' : 'hover:text-white'}`}
-              onClick={() => setLanguage('ro')}
-              aria-label="Română"
-            >
-              RO
-            </button>
+            <div className="relative" ref={menuRef}>
+              <button
+                className="glass-border hover:bg-white/5 transition-colors flex items-center gap-2 px-2 py-1 rounded text-xs text-white"
+                aria-haspopup="menu"
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
+              >
+                <Globe className="w-4 h-4" /> {language.toUpperCase()}
+              </button>
+              {open && (
+                <div role="menu" className="absolute right-0 mt-2 glass-card rounded-lg overflow-hidden text-xs min-w-[120px]">
+                  <button
+                    role="menuitem"
+                    className={`block w-full text-left px-3 py-2 hover:bg-white/5 ${language === 'en' ? 'text-white' : 'text-gray-300'}`}
+                    onClick={() => { setLanguage('en'); setOpen(false); }}
+                    aria-label="English"
+                  >
+                    EN — English
+                  </button>
+                  <button
+                    role="menuitem"
+                    className={`block w-full text-left px-3 py-2 hover:bg-white/5 ${language === 'ro' ? 'text-white' : 'text-gray-300'}`}
+                    onClick={() => { setLanguage('ro'); setOpen(false); }}
+                    aria-label="Română"
+                  >
+                    RO — Română
+                  </button>
+                </div>
+              )}
+            </div>
             <Link href="/settings" className="hover:text-white transition-colors" aria-label="Profile">
               <User className="w-4 h-4" />
             </Link>
