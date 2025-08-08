@@ -1,19 +1,21 @@
 import Link from 'next/link';
 import { Package, Search, MapPin, ArrowRight, Star, PlayCircle, Zap } from 'lucide-react';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
+import { useT } from '@/utils/i18n';
 
 export default function HomePage() {
+  const t = useT();
   return (
     <>
-      <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover">
+      <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover bg-center">
         <h1 className="text-4xl md:text-7xl font-normal text-white tracking-tight text-center slide-up delay-400">Fleetopia</h1>
-        <p className="max-w-md text-2xl text-gray-400 text-center mb-8 fade-in delay-600">How can we help you today? Pick your path below.</p>
+        <p className="max-w-md text-2xl text-gray-400 text-center mb-8 fade-in delay-600">{t('How can we help you today? Pick your path below.')}</p>
         <div className="flex gap-4 items-center">
           <Link href="/marketplace?add=1&tab=MY_CARGO" className="glass-border hover:bg-white/5 transition-all flex items-center gap-2 text-sm font-medium bg-gray-900 text-white rounded-lg px-6 py-2 slide-left delay-800">
-            <Package className="w-4 h-4" /> I have cargo to transport
+            <Package className="w-4 h-4" /> {t('I have cargo to transport')}
           </Link>
           <Link href="/marketplace?tab=ALL" className="hover:text-white transition-colors flex items-center gap-2 text-sm text-gray-400 px-6 py-2 slide-right delay-1000">
-            <Search className="w-4 h-4" /> I'm looking for cargo to transport
+            <Search className="w-4 h-4" /> {t("I'm looking for cargo to transport")}
           </Link>
         </div>
       </section>
@@ -21,13 +23,13 @@ export default function HomePage() {
       <section id="about" className="max-w-4xl mx-auto px-6 py-24">
         <AnimateOnScroll className="flex items-center gap-3 mb-8">
           <Zap className="w-5 h-5 text-gray-400" />
-          <h2 className="text-xl font-medium text-white">Quick Actions</h2>
+          <h2 className="text-xl font-medium text-white">{t('Quick Actions')}</h2>
         </AnimateOnScroll>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: 'I have cargo to transport', icon: <Package className="w-5 h-5" />, cta: 'Get started' },
-            { title: "I'm looking for cargo to transport", icon: <Search className="w-5 h-5" />, cta: 'Search loads' },
-            { title: 'Track My Shipments', icon: <MapPin className="w-5 h-5" />, cta: 'View shipments' },
+            { title: t('I have cargo to transport'), icon: <Package className="w-5 h-5" />, cta: t('Get started') },
+            { title: t("I'm looking for cargo to transport"), icon: <Search className="w-5 h-5" />, cta: t('Search loads') },
+            { title: t('Track My Shipments'), icon: <MapPin className="w-5 h-5" />, cta: t('View shipments') },
           ].map((card) => (
             <AnimateOnScroll key={card.title}>
               <div className="glass-card p-6 rounded-xl hover:bg-white/5 transition-all cursor-pointer">
@@ -49,7 +51,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-6">
           <AnimateOnScroll className="flex items-center gap-3 mb-12">
             <PlayCircle className="w-5 h-5 text-gray-400" />
-            <h2 className="text-xl font-medium text-gray-400">How It Works</h2>
+          <h2 className="text-xl font-medium text-gray-400">{t('How It Works')}</h2>
           </AnimateOnScroll>
           <div className="space-y-6">
             {[1,2,3].map((step) => (
@@ -59,8 +61,8 @@ export default function HomePage() {
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-gray-400/10 rounded-lg flex items-center justify-center flex-shrink-0"><span className="text-xl font-medium text-gray-400">{step}</span></div>
                       <div>
-                        <h3 className="font-medium text-gray-400 mb-1">{step === 1 ? 'Post or Find' : step === 2 ? 'Connect & Quote' : 'Track & Complete'}</h3>
-                        <p className="text-sm text-gray-400">{step === 1 ? "Whether you have cargo to ship or you're looking for loads to transport, get started in seconds." : step === 2 ? 'Connect with verified partners and send competitive quotes.' : 'Monitor shipments in real-time with GPS tracking and updates.'}</p>
+                        <h3 className="font-medium text-gray-400 mb-1">{step === 1 ? t('Post or Find') : step === 2 ? t('Connect & Quote') : t('Track & Complete')}</h3>
+                        <p className="text-sm text-gray-400">{step === 1 ? t("Whether you have cargo to ship or you're looking for loads to transport, get started in seconds.") : step === 2 ? t('Connect with verified partners and send competitive quotes.') : t('Monitor shipments in real-time with GPS tracking and updates.')}</p>
                       </div>
                     </div>
                   </div>
@@ -80,7 +82,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-6">
           <AnimateOnScroll className="flex items-center gap-3 mb-12">
             <Star className="w-5 h-5 text-gray-400" />
-            <h2 className="text-xl font-medium text-white">What Our Users Say</h2>
+          <h2 className="text-xl font-medium text-white">{t('What Our Users Say')}</h2>
           </AnimateOnScroll>
           <div className="testimonial-slider">
             <div className="testimonial-track">

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { MapPin, Settings as SettingsIcon, Gauge, Calculator, MessageSquare, X } from 'lucide-react';
+import { useT } from '@/utils/i18n';
 import Modal from '@/components/Modal';
 
 type AgentSuggestion = {
@@ -21,6 +22,7 @@ type Vehicle = {
 };
 
 export default function DispatcherPage() {
+  const t = useT();
   // Tabs
   const [activeTab, setActiveTab] = useState<'ai-suggestions' | 'fleet-management'>('fleet-management');
 
@@ -217,7 +219,7 @@ export default function DispatcherPage() {
   }
 
   return (
-    <section className="min-h-screen bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover pt-6 px-6 pb-24">
+    <section className="min-h-screen bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover bg-center pt-6 px-6 pb-24">
       <div className="max-w-7xl mx-auto">
         <div className="flex gap-6">
           {/* Left Sidebar */}
@@ -226,7 +228,7 @@ export default function DispatcherPage() {
               {/* Agent Control */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-white">AI Agent</h2>
+                  <h2 className="text-lg font-semibold text-white">{t('AI Agent')}</h2>
                   <label className="inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -243,19 +245,19 @@ export default function DispatcherPage() {
                   onClick={() => setIsCostModalOpen(true)}
                   className="glass-border hover:bg-white/5 transition-all w-full flex gap-2 text-sm font-medium text-white rounded-lg px-4 py-3 items-center justify-center"
                 >
-                  <SettingsIcon className="w-4 h-4" /> Cost Settings
+                  <SettingsIcon className="w-4 h-4" /> {t('Cost Settings')}
                 </button>
               </div>
 
               {/* Levels */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">Agent Levels</h3>
+                <h3 className="text-sm font-medium text-gray-300 mb-2">{t('Agent Levels')}</h3>
 
                 {/* L0 */}
                 <div className={`glass-border rounded-lg p-4 ${levelsEnabled[0] ? 'level-active' : ''}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">L0 — Radar</span>
+                  <span className="text-sm font-medium text-white">L0 — Radar</span>
                       <Gauge className="w-4 h-4 text-red-400" />
                     </div>
                     <label className="inline-flex items-center cursor-pointer">
@@ -278,7 +280,7 @@ export default function DispatcherPage() {
                 <div className={`glass-border rounded-lg p-4 ${levelsEnabled[1] ? 'level-active' : ''}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">L1 — Calculator</span>
+                  <span className="text-sm font-medium text-white">L1 — Calculator</span>
                       <Calculator className="w-4 h-4 text-red-400" />
                     </div>
                     <label className="inline-flex items-center cursor-pointer">
@@ -301,7 +303,7 @@ export default function DispatcherPage() {
                 <div className={`glass-border rounded-lg p-4 ${levelsEnabled[2] ? 'level-active' : ''}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">L2 — Quote Bot</span>
+                  <span className="text-sm font-medium text-white">L2 — Quote Bot</span>
                       <MessageSquare className="w-4 h-4 text-red-400" />
                     </div>
                     <label className="inline-flex items-center cursor-pointer">
@@ -325,9 +327,9 @@ export default function DispatcherPage() {
               <div className="mt-8 pt-6 border-t border-gray-700">
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`w-2 h-2 rounded-full ${agentEnabled ? 'bg-green-500' : 'bg-gray-500'}`} />
-                  <span className="text-xs text-gray-400">{agentEnabled ? 'Agent Active' : 'Agent Inactive'}</span>
+                  <span className="text-xs text-gray-400">{agentEnabled ? t('Agent Active') : t('Agent Inactive')}</span>
                 </div>
-                <div className="text-xs text-gray-500">{agentEnabled ? 'Monitoring system status' : 'No active processes'}</div>
+                <div className="text-xs text-gray-500">{agentEnabled ? t('Monitoring system status') : t('No active processes')}</div>
               </div>
             </div>
           </aside>
@@ -341,13 +343,13 @@ export default function DispatcherPage() {
                   className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'ai-suggestions' ? 'tab-active' : 'text-gray-400'}`}
                   onClick={() => setActiveTab('ai-suggestions')}
                 >
-                  AI Suggestions
+                  {t('AI Suggestions')}
                 </button>
                 <button
                   className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'fleet-management' ? 'tab-active' : 'text-gray-400'}`}
                   onClick={() => setActiveTab('fleet-management')}
                 >
-                  Fleet Management
+                  {t('Fleet Management')}
                 </button>
               </div>
 
@@ -430,8 +432,8 @@ export default function DispatcherPage() {
                       <div className="glass-border h-[32rem] flex bg-gray-800/20 rounded-lg items-center justify-center relative">
                         <div className="text-center">
                           <MapPin className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                          <h4 className="text-lg font-medium text-white mb-2">Interactive Map</h4>
-                          <p className="text-gray-400">GPS tracking with real-time vehicle positions</p>
+                          <h4 className="text-lg font-medium text-white mb-2">{t('Interactive Map')}</h4>
+                          <p className="text-gray-400">{t('GPS tracking with real-time vehicle positions')}</p>
                         </div>
                         {/* Marker examples */}
                         <div className="absolute top-16 left-20">
@@ -450,18 +452,18 @@ export default function DispatcherPage() {
                     {/* Vehicle Grid */}
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">Fleet Vehicles</h3>
+                        <h3 className="text-lg font-semibold text-white">{t('Fleet Vehicles')}</h3>
                         <div className="flex items-center gap-4">
                           <input
                             type="text"
-                            placeholder="Search vehicles..."
+                             placeholder={t('Search vehicles...')}
                             className="glass-input px-3 py-2 rounded-lg text-sm text-white bg-transparent focus:outline-none"
                           />
                           <select className="glass-input px-3 py-2 rounded-lg text-sm text-white bg-transparent focus:outline-none">
-                            <option value="all" className="bg-gray-900 text-white">All Status</option>
-                            <option value="active" className="bg-gray-900 text-white">Active</option>
-                            <option value="inactive" className="bg-gray-900 text-white">Inactive</option>
-                            <option value="maintenance" className="bg-gray-900 text-white">Maintenance</option>
+                            <option value="all" className="bg-gray-900 text-white">{t('All Status')}</option>
+                            <option value="active" className="bg-gray-900 text-white">{t('Active')}</option>
+                            <option value="inactive" className="bg-gray-900 text-white">{t('Inactive')}</option>
+                            <option value="maintenance" className="bg-gray-900 text-white">{t('Maintenance')}</option>
                           </select>
                         </div>
                       </div>
@@ -503,7 +505,7 @@ export default function DispatcherPage() {
                     >
                       <span className="inline-flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                        Add Fleet Vehicle
+                        {t('Add Fleet Vehicle')}
                       </span>
                     </button>
                   </div>
@@ -518,7 +520,7 @@ export default function DispatcherPage() {
           <div className="fixed top-4 right-4 glass-card rounded-lg p-4 z-50">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-white">{toast}</span>
+              <span className="text-sm text-white">{t('Settings saved successfully')}</span>
               <button className="text-gray-400 hover:text-white" onClick={() => setToast(null)} aria-label="Close toast">
                 <X className="w-4 h-4" />
               </button>

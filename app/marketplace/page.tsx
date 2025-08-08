@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Modal from '@/components/Modal';
 import { MapPin } from 'lucide-react';
+import { useT } from '@/utils/i18n';
 
 type Cargo = {
   id: number;
@@ -29,6 +30,7 @@ const demoCargo: Cargo[] = [
 ];
 
 export default function MarketplacePage() {
+  const t = useT();
   const [activeTab, setActiveTab] = useState<'ALL'|'MY_CARGO'|'MY_QUOTES'|'ACTIVE_DEALS'>('ALL');
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState({ country:'', sort:'newest', type:'', urgency:'', date:'', min:'', max:'' });
@@ -62,13 +64,13 @@ export default function MarketplacePage() {
         <div className="flex items-center justify-between mb-8 animate-on-scroll in-view">
           <div className="flex items-center gap-8 text-sm text-gray-400">
             {[
-              {k:'ALL', label:'ALL OFFERS'},
-              {k:'MY_CARGO', label:'MY CARGO'},
-              {k:'MY_QUOTES', label:'MY QUOTES'},
-              {k:'ACTIVE_DEALS', label:'ACTIVE DEALS'},
-            ].map((t:any) => (
-              <button key={t.k} onClick={()=>setActiveTab(t.k)} className={`hover:text-white transition-colors border-b pb-2 ${activeTab===t.k ? 'tab-active' : 'border-transparent'}`}>
-                {t.label}
+              {k:'ALL', label:t('ALL OFFERS')},
+              {k:'MY_CARGO', label:t('MY CARGO')},
+              {k:'MY_QUOTES', label:t('MY QUOTES')},
+              {k:'ACTIVE_DEALS', label:t('ACTIVE DEALS')},
+            ].map((tab:any) => (
+              <button key={tab.k} onClick={()=>setActiveTab(tab.k)} className={`hover:text-white transition-colors border-b pb-2 ${activeTab===tab.k ? 'tab-active' : 'border-transparent'}`}>
+                {tab.label}
               </button>
             ))}
           </div>
@@ -87,7 +89,7 @@ export default function MarketplacePage() {
         {/* Search */}
         <div className="mb-6 animate-on-scroll in-view">
           <div className="relative">
-            <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search cargo..." className="glass-input w-full placeholder-gray-400 text-white rounded-lg py-3 pl-12 pr-10" />
+            <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder={t('Search cargo...')} className="glass-input w-full placeholder-gray-400 text-white rounded-lg py-3 pl-12 pr-10" />
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-4 top-3.5 text-gray-400"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
             {query && (
               <button aria-label="Clear" onClick={()=>setQuery('')} className="absolute right-3 top-3.5 text-gray-400 hover:text-white">
@@ -100,41 +102,41 @@ export default function MarketplacePage() {
         {/* Filters */}
         <div className="flex gap-4 flex-wrap mb-8 items-center animate-on-scroll in-view">
           <select value={filters.country} onChange={(e)=>setFilters({...filters, country:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
-            <option value="">All Countries</option>
-            <option value="nl">Netherlands</option>
-            <option value="de">Germany</option>
-            <option value="fr">France</option>
-            <option value="be">Belgium</option>
-            <option value="it">Italy</option>
+            <option value="">{t('All Countries')}</option>
+            <option value="nl">{t('Netherlands')}</option>
+            <option value="de">{t('Germany')}</option>
+            <option value="fr">{t('France')}</option>
+            <option value="be">{t('Belgium')}</option>
+            <option value="it">{t('Italy')}</option>
           </select>
           <select value={filters.sort} onChange={(e)=>setFilters({...filters, sort:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="price-high">Price High to Low</option>
-            <option value="price-low">Price Low to High</option>
+            <option value="newest">{t('Newest First')}</option>
+            <option value="oldest">{t('Oldest First')}</option>
+            <option value="price-high">{t('Price High to Low')}</option>
+            <option value="price-low">{t('Price Low to High')}</option>
           </select>
           <select value={filters.type} onChange={(e)=>setFilters({...filters, type:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
-            <option value="">All Types</option>
-            <option value="pallets">Pallets</option>
-            <option value="container">Container</option>
-            <option value="bulk">Bulk</option>
+            <option value="">{t('All Types')}</option>
+            <option value="pallets">{t('Pallets')}</option>
+            <option value="container">{t('Container')}</option>
+            <option value="bulk">{t('Bulk')}</option>
           </select>
           <select value={filters.urgency} onChange={(e)=>setFilters({...filters, urgency:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
-            <option value="">All Urgency</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
+            <option value="">{t('All Urgency')}</option>
+            <option value="low">{t('Low')}</option>
+            <option value="medium">{t('Medium')}</option>
+            <option value="high">{t('High')}</option>
+            <option value="urgent">{t('Urgent')}</option>
           </select>
           <select value={filters.date} onChange={(e)=>setFilters({...filters, date:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
-            <option value="">All Dates</option>
-            <option value="today">Today</option>
-            <option value="this-week">This Week</option>
-            <option value="this-month">This Month</option>
+            <option value="">{t('All Dates')}</option>
+            <option value="today">{t('Today')}</option>
+            <option value="this-week">{t('This Week')}</option>
+            <option value="this-month">{t('This Month')}</option>
           </select>
-          <input value={filters.min} onChange={(e)=>setFilters({...filters, min:e.target.value})} type="number" placeholder="Min" className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2 w-20" />
-          <input value={filters.max} onChange={(e)=>setFilters({...filters, max:e.target.value})} type="number" placeholder="Max" className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2 w-20" />
-          <button onClick={()=>setFilters({ country:'', sort:'newest', type:'', urgency:'', date:'', min:'', max:'' })} className="text-sm text-gray-400 hover:text-white px-3 py-2">Clear</button>
+          <input value={filters.min} onChange={(e)=>setFilters({...filters, min:e.target.value})} type="number" placeholder={t('Min')} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2 w-20" />
+          <input value={filters.max} onChange={(e)=>setFilters({...filters, max:e.target.value})} type="number" placeholder={t('Max')} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2 w-20" />
+          <button onClick={()=>setFilters({ country:'', sort:'newest', type:'', urgency:'', date:'', min:'', max:'' })} className="text-sm text-gray-400 hover:text-white px-3 py-2">{t('Clear')}</button>
         </div>
 
         {/* Grid */}
@@ -171,10 +173,10 @@ export default function MarketplacePage() {
       </div>
 
       {/* Add Cargo Modal */}
-      <Modal open={addOpen} onClose={() => setAddOpen(false)} title="Add New Cargo">
+      <Modal open={addOpen} onClose={() => setAddOpen(false)} title={t('Add New Cargo')}>
         <form className="space-y-6" onSubmit={(e)=>{e.preventDefault(); setAddOpen(false);}}>
           <div>
-            <h3 className="text-base font-medium text-gray-300 mb-3">Cargo Details</h3>
+            <h3 className="text-base font-medium text-gray-300 mb-3">{t('Cargo Details')}</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
                 <label className="block text-xs text-gray-400 mb-2">Cargo Title</label>
@@ -242,13 +244,13 @@ export default function MarketplacePage() {
             <h3 className="text-base font-medium text-gray-300 mb-3">Pricing & Additional Information</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-400 mb-2">Budget (EUR)</label>
+                <label className="block text-xs text-gray-400 mb-2">{t('Budget (EUR)')}</label>
                 <input type="number" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter price" />
             </div>
             <div>
-                <label className="block text-xs text-gray-400 mb-2">Special Requirements</label>
+                <label className="block text-xs text-gray-400 mb-2">{t('Special Requirements')}</label>
                 <select className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
-                  <option value="">No special requirements</option>
+                  <option value="">{t('No special requirements')}</option>
                   <option value="refrigerated">Refrigerated transport</option>
                   <option value="fragile">Fragile goods</option>
                   <option value="hazardous">Hazardous materials</option>
@@ -257,14 +259,14 @@ export default function MarketplacePage() {
               </div>
             </div>
             <div className="mt-2">
-              <label className="block text-xs text-gray-400 mb-2">Additional Notes</label>
+              <label className="block text-xs text-gray-400 mb-2">{t('Additional Notes')}</label>
               <textarea rows={4} className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400 resize-none" placeholder="Add any additional information or special instructions..."></textarea>
             </div>
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-700">
-            <button type="button" onClick={()=>setAddOpen(false)} className="px-6 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-            <button type="submit" className="glass-border hover:bg-white/5 transition-all px-6 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg">Add Cargo</button>
+            <button type="button" onClick={()=>setAddOpen(false)} className="px-6 py-2 text-sm text-gray-400 hover:text-white">{t('Cancel')}</button>
+            <button type="submit" className="glass-border hover:bg-white/5 transition-all px-6 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg">{t('Add Cargo Submit')}</button>
           </div>
         </form>
       </Modal>
