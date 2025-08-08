@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Modal from '@/components/Modal';
 import { MapPin } from 'lucide-react';
 import { useT } from '@/utils/i18n';
+import AnimateOnScroll from '@/components/AnimateOnScroll';
 
 type Cargo = {
   id: number;
@@ -61,7 +62,8 @@ export default function MarketplacePage() {
     <section className="min-h-screen bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover pt-6 px-6 pb-24">
       <div className="max-w-6xl mx-auto">
         {/* Header Tabs + Actions */}
-        <div className="flex items-center justify-between mb-8 animate-on-scroll in-view">
+        <AnimateOnScroll>
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-8 text-sm text-gray-400">
             {[
               {k:'ALL', label:t('ALL OFFERS')},
@@ -85,9 +87,11 @@ export default function MarketplacePage() {
             </button>
           </div>
         </div>
+        </AnimateOnScroll>
 
         {/* Search */}
-        <div className="mb-6 animate-on-scroll in-view">
+        <AnimateOnScroll>
+        <div className="mb-6">
           <div className="relative">
             <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder={t('Search cargo...')} className="glass-input w-full placeholder-gray-400 text-white rounded-lg py-3 pl-12 pr-10" />
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-4 top-3.5 text-gray-400"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
@@ -98,9 +102,11 @@ export default function MarketplacePage() {
             )}
           </div>
         </div>
+        </AnimateOnScroll>
 
         {/* Filters */}
-        <div className="flex gap-4 flex-wrap mb-8 items-center animate-on-scroll in-view">
+        <AnimateOnScroll>
+        <div className="flex gap-4 flex-wrap mb-8 items-center">
           <select value={filters.country} onChange={(e)=>setFilters({...filters, country:e.target.value})} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2">
             <option value="">{t('All Countries')}</option>
             <option value="nl">{t('Netherlands')}</option>
@@ -138,9 +144,11 @@ export default function MarketplacePage() {
           <input value={filters.max} onChange={(e)=>setFilters({...filters, max:e.target.value})} type="number" placeholder={t('Max')} className="glass-input text-sm text-white bg-transparent rounded-lg px-3 py-2 w-20" />
           <button onClick={()=>setFilters({ country:'', sort:'newest', type:'', urgency:'', date:'', min:'', max:'' })} className="text-sm text-gray-400 hover:text-white px-3 py-2">{t('Clear')}</button>
         </div>
+        </AnimateOnScroll>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-on-scroll in-view">
+        <AnimateOnScroll>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((c) => (
             <div key={c.id} className="glass-card rounded-xl p-6 hover:bg-white/5 transition-all cursor-pointer relative group" onClick={()=>setDetailId(c.id)}>
               <div className="absolute top-4 right-4">
@@ -170,6 +178,7 @@ export default function MarketplacePage() {
             </div>
           ))}
         </div>
+        </AnimateOnScroll>
       </div>
 
       {/* Add Cargo Modal */}

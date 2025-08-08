@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { MapPin, Settings as SettingsIcon, Gauge, Calculator, MessageSquare, X } from 'lucide-react';
 import { useT } from '@/utils/i18n';
 import Modal from '@/components/Modal';
+import AnimateOnScroll from '@/components/AnimateOnScroll';
 
 type AgentSuggestion = {
   level: 'L0' | 'L1' | 'L2';
@@ -338,24 +339,27 @@ export default function DispatcherPage() {
           <div className="flex-1">
             <div className="glass-card rounded-xl h-full">
               {/* Tabs */}
-              <div className="flex items-center gap-8 px-6 py-4 border-b border-gray-700">
-                <button
-                  className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'ai-suggestions' ? 'tab-active' : 'text-gray-400'}`}
-                  onClick={() => setActiveTab('ai-suggestions')}
-                >
-                  {t('AI Suggestions')}
-                </button>
-                <button
-                  className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'fleet-management' ? 'tab-active' : 'text-gray-400'}`}
-                  onClick={() => setActiveTab('fleet-management')}
-                >
-                  {t('Fleet Management')}
-                </button>
-              </div>
+              <AnimateOnScroll>
+                <div className="flex items-center gap-8 px-6 py-4 border-b border-gray-700">
+                  <button
+                    className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'ai-suggestions' ? 'tab-active' : 'text-gray-400'}`}
+                    onClick={() => setActiveTab('ai-suggestions')}
+                  >
+                    {t('AI Suggestions')}
+                  </button>
+                  <button
+                    className={`tab-btn text-sm border-b pb-2 transition-colors ${activeTab === 'fleet-management' ? 'tab-active' : 'text-gray-400'}`}
+                    onClick={() => setActiveTab('fleet-management')}
+                  >
+                    {t('Fleet Management')}
+                  </button>
+                </div>
+              </AnimateOnScroll>
 
               <div className="p-6">
                 {/* AI Suggestions View */}
                 {activeTab === 'ai-suggestions' && (
+                  <AnimateOnScroll>
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-lg font-semibold text-white">AI Suggestions</h3>
@@ -422,10 +426,12 @@ export default function DispatcherPage() {
                       </div>
                     </div>
                   </div>
+                  </AnimateOnScroll>
                 )}
 
                 {/* Fleet Management View */}
                 {activeTab === 'fleet-management' && (
+                  <AnimateOnScroll>
                   <div>
                     {/* Map */}
                     <div className="mb-6">
@@ -509,6 +515,7 @@ export default function DispatcherPage() {
                       </span>
                     </button>
                   </div>
+                  </AnimateOnScroll>
                 )}
               </div>
             </div>
