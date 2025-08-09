@@ -4,8 +4,11 @@ import helmet from 'helmet';
 import { createServer } from 'http';
 import { createSocketServer } from './ws/index.js';
 import { apiLimiter } from './lib/rateLimit.js';
-import { logger } from './lib/logger.js';
-import { clerkMiddleware } from './util/clerk.js';
+import logger from './utils/logger.js';
+import { clerkMiddleware, requireAuth } from '@clerk/express';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '../.env.local' });
 
 // Routers
 import homeRouter from './routes/home.js';
@@ -18,11 +21,24 @@ import fleetRouter from './routes/fleet.js';
 import settingsRouter from './routes/settings.js';
 
 const app = express();
-app.use(cors());
+
+// CORS origins din env
+const allowedOrigins = (process.env.CLERK_ALLOWED_ORIGINS || 'http://localhost:3000')
+  .split(',')
+  .map((s) => s.trim());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
 app.use(apiLimiter);
-app.use(clerkMiddleware);
+
+// Logging requests basic
+app.use((req, _res, next) => {
+  logger.info(`${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// Clerk middleware real
+app.use(clerkMiddleware());
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
@@ -38,8 +54,8 @@ app.use('/api', settingsRouter);
 
 // Error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  logger.error(String(err?.message || err));
-  res.status(500).json({ error: 'Internal Server Error' });
+  logger.error(err?.message || 'Unexpected error');
+  res.status(err?.status || 500).json({ error: 'Server error' });
 });
 
 const httpServer = createServer(app);
