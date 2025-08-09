@@ -21,7 +21,8 @@
       ]
     },
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -39,6 +40,8 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "backend/**",
+    "agent-core/**"
   ]
 }
