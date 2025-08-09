@@ -21,8 +21,7 @@
       ]
     },
     "types": [
-      "node",
-      "jest"
+      "node"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -42,6 +41,11 @@
   "exclude": [
     "node_modules",
     "backend/**",
-    "agent-core/**"
+    "agent-core/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**"
   ]
 }
