@@ -9,21 +9,264 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  role      String   @default("trial")
-  createdAt DateTime @default(now())
-  cargos    Cargo[]
+  id                   String                @id @default(cuid())
+  clerkId              String                @unique
+  email                String                @unique
+  role                 String                @default("trial")
+  createdAt            DateTime              @default(now())
+  cargos               Cargo[]
+  quotesAsTransporter  Quote[]               @relation("quotes_transporter")
+  dealsAsShipper       Deal[]                @relation("deal_shipper")
+  dealsAsTransporter   Deal[]                @relation("deal_transporter")
+  messagesSent         ChatMessage[]
+  vehiclesOwned        Vehicle[]             @relation("vehicle_owner")
+  vehiclesDriven       Vehicle[]             @relation("vehicle_driver")
+  costSettings         CostSettings?
+  notificationSettings NotificationSettings?
+  userSettings         UserSettings?
 }
 
 model Cargo {
+  id           String       @id @default(cuid())
+  userId       String
+  title        String
+  type         CargoType    @default(GENERAL)
+  weight       Float
+  volume       Float?
+  vehicleType  VehicleType?
+  urgency      UrgencyLevel @default(MEDIUM)
+  fromAddress  String?
+  toAddress    String?
+  fromCountry  String?
+  toCountry    String?
+  fromPostal   String?
+  toPostal     String?
+  fromCity     String?
+  toCity       String?
+  loadingDate  DateTime?
+  deliveryDate DateTime?
+  totalPrice   Decimal?
+  pricePerKg   Decimal?
+  status       CargoStatus  @default(ACTIVE)
+  description  String?
+  images       Json?
+  viewCount    Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  User     User      @relation(fields: [userId], references: [id])
+  quotes   Quote[]
+  deal     Deal?
+  vehicles Vehicle[]
+}
+
+enum CargoType {
+  GENERAL
+  FRAGILE
+  LIQUID
+  REFRIGERATED
+  HAZARDOUS
+  BULK
+  CONTAINER
+  PALLETS
+}
+
+enum VehicleType {
+  TRUCK
+  VAN
+  TRAILER
+  FLATBED
+  REFRIGERATED
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CargoStatus {
+  DRAFT
+  ACTIVE
+  QUOTED
+  ASSIGNED
+  COMPLETED
+  CANCELLED
+}
+
+model Quote {
+  id            String      @id @default(cuid())
+  cargoId       String
+  transporterId String
+  price         Decimal
+  estimatedDays Int
+  message       String?
+  status        QuoteStatus @default(PENDING)
+  aiGenerated   Boolean     @default(false)
+  confidence    String?
+  createdAt     DateTime    @default(now())
+  expiresAt     DateTime?
+
+  cargo       Cargo        @relation(fields: [cargoId], references: [id])
+  transporter User         @relation("quotes_transporter", fields: [transporterId], references: [id])
+  deal        Deal?
+  threads     ChatThread[]
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Deal {
+  id            String     @id @default(cuid())
+  cargoId       String     @unique
+  quoteId       String     @unique
+  shipperId     String
+  transporterId String
+  status        DealStatus @default(CONFIRMED)
+  progress      Int        @default(0)
+  timeline      Json?
+  totalAmount   Decimal?
+  createdAt     DateTime   @default(now())
+  completedAt   DateTime?
+
+  cargo       Cargo        @relation(fields: [cargoId], references: [id])
+  quote       Quote        @relation(fields: [quoteId], references: [id])
+  shipper     User         @relation("deal_shipper", fields: [shipperId], references: [id])
+  transporter User         @relation("deal_transporter", fields: [transporterId], references: [id])
+  threads     ChatThread[]
+}
+
+enum DealStatus {
+  CONFIRMED
+  IN_TRANSIT
+  DELIVERED
+  DISPUTED
+  COMPLETED
+}
+
+model ChatThread {
+  id            String    @id @default(cuid())
+  dealId        String?
+  quoteId       String?
+  participants  Json
+  lastMessageAt DateTime?
+  isActive      Boolean   @default(true)
+
+  deal     Deal?         @relation(fields: [dealId], references: [id])
+  quote    Quote?        @relation(fields: [quoteId], references: [id])
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id          String      @id @default(cuid())
+  threadId    String
+  senderId    String
+  message     String
+  messageType MessageType @default(TEXT)
+  readAt      DateTime?
+  createdAt   DateTime    @default(now())
+
+  thread ChatThread @relation(fields: [threadId], references: [id])
+  sender User       @relation(fields: [senderId], references: [id])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+}
+
+model Vehicle {
+  id             String        @id @default(cuid())
+  ownerId        String
+  type           VehicleType
+  licensePlate   String
+  capacity       Json?
+  gpsDeviceId    String?
+  manualPosition Json?
+  driverId       String?
+  status         VehicleStatus @default(ACTIVE)
+  currentCargoId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  owner        User              @relation("vehicle_owner", fields: [ownerId], references: [id])
+  driver       User?             @relation("vehicle_driver", fields: [driverId], references: [id])
+  currentCargo Cargo?            @relation(fields: [currentCargoId], references: [id])
+  locations    VehicleLocation[]
+
+  @@unique([ownerId, licensePlate])
+}
+
+enum VehicleStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+model VehicleLocation {
   id        String   @id @default(cuid())
-  userId    String
-  title     String
-  weight    Float
-  price     Float?
-  status    String   @default("active")
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id])
+  vehicleId String
+  lat       Decimal
+  long      Decimal
+  speed     Decimal?
+  heading   Int?
+  accuracy  Decimal?
+  timestamp DateTime @default(now())
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+}
+
+model CostSettings {
+  userId        String   @id
+  driverPay     Decimal
+  fuel          Decimal
+  maintenance   Decimal
+  tolls         Decimal
+  insurance     Decimal
+  baseMargin    Decimal
+  totalBaseCost Decimal?
+  updatedAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model NotificationSettings {
+  userId             String         @id
+  emailNotifications Json?
+  pushNotifications  Json?
+  inAppNotifications Json?
+  emailFrequency     EmailFrequency @default(INSTANT)
+  quietHours         Json?
+  updatedAt          DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum EmailFrequency {
+  INSTANT
+  DAILY
+  WEEKLY
+  NEVER
+}
+
+model UserSettings {
+  userId      String   @id
+  preferences Json?
+  theme       Theme    @default(DARK)
+  privacy     Json?
+  lastUpdated DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  AUTO
 }
