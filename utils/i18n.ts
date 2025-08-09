@@ -107,7 +107,6 @@ const translations: Record<Language, Record<string, string>> = {
     "Save Settings": "Salvează",
     Reset: "Reset",
     // Note: duplicate keys avoided
-    Settings: "Setări",
     "Manage your account, permissions, and application preferences": "Gestionează contul, permisiunile și preferințele aplicației",
     "User Level": "Nivel utilizator",
     "Account Status": "Starea contului",
