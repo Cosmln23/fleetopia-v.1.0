@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import { requireAuth } from '@clerk/express';
 import { z } from 'zod';
+import prisma from '../lib/prisma';
 
 const router = Router();
 
@@ -29,13 +30,28 @@ const quickPostSchema = z.object({
   toAddress: z.string().min(1),
 });
 
-router.post('/cargo/quick-post', requireAuth, (req: Request, res: Response) => {
+router.post('/cargo/quick-post', requireAuth(), async (req: Request, res: Response) => {
   const parsed = quickPostSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return res.status(400).json({ error: 'Invalid input' });
-  }
-  const draftId = 'draft-' + Math.random().toString(36).slice(2);
-  return res.json({ success: true, draftId });
+  if (!parsed.success) return res.status(400).json({ error: 'Invalid input' });
+  const auth = (req as any).auth;
+  const clerkId = auth?.userId as string;
+  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  const user = await prisma.user.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId, email: `${clerkId}@local.dev` },
+  });
+  const created = await prisma.cargo.create({
+    data: {
+      userId: user.id,
+      title: parsed.data.title,
+      fromAddress: parsed.data.fromAddress,
+      toAddress: parsed.data.toAddress,
+      status: 'ACTIVE',
+    },
+    select: { id: true },
+  });
+  return res.json({ success: true, draftId: created.id });
 });
 
 router.put('/cargo/:id/update', requireAuth, (_req: Request, res: Response) => {

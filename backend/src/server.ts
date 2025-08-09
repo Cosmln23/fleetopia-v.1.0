@@ -2,23 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createServer } from 'http';
-import { createSocketServer } from './ws/index.js';
-import { apiLimiter } from './lib/rateLimit.js';
-import logger from './utils/logger.js';
-import { clerkMiddleware, requireAuth } from '@clerk/express';
+import { createSocketServer } from './ws/index';
+import { apiLimiter } from './lib/rateLimit';
+import logger from './lib/logger';
+import { clerkMiddleware } from '@clerk/express';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: '../.env.local' });
 
 // Routers
-import homeRouter from './routes/home.js';
-import marketplaceRouter from './routes/marketplace.js';
-import cargoRouter from './routes/cargo.js';
-import quotesRouter from './routes/quotes.js';
-import dealsRouter from './routes/deals.js';
-import agentRouter from './routes/agent.js';
-import fleetRouter from './routes/fleet.js';
-import settingsRouter from './routes/settings.js';
+import homeRouter from './routes/home';
+import marketplaceRouter from './routes/marketplace';
+import cargoRouter from './routes/cargo';
+import quotesRouter from './routes/quotes';
+import dealsRouter from './routes/deals';
+import agentRouter from './routes/agent';
+import fleetRouter from './routes/fleet';
+import settingsRouter from './routes/settings';
 
 const app = express();
 

@@ -1,27 +1,66 @@
 import { Router, type Request, type Response } from 'express';
 import { requireAuth } from '@clerk/express';
+import prisma from '../lib/prisma';
 
 const router = Router();
 
-router.get('/marketplace/all-offers', (req: Request, res: Response) => {
-  const search = String(req.query.search || '').toLowerCase();
-  const data = [
-    { id: 1, title: 'Electronics Shipment', price: 1850, urgency: 'medium' },
-    { id: 2, title: 'Food & Beverages', price: 3200, urgency: 'high' },
-  ].filter((c) => c.title.toLowerCase().includes(search));
-  res.json({ cargo: data, pagination: { total: data.length, pages: 1 } });
+router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
+  const search = String(req.query.search || '').trim();
+  const cargos = await prisma.cargo.findMany({
+    where: {
+      status: 'ACTIVE',
+      ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, title: true, urgency: true, totalPrice: true },
+    take: 50,
+  });
+  const mapped = cargos.map((c: any) => ({
+    id: c.id,
+    title: c.title,
+    urgency: String(c.urgency).toLowerCase(),
+    price: c.totalPrice ? Number(c.totalPrice) : null,
+  }));
+  res.json({ cargo: mapped, pagination: { total: mapped.length, pages: 1 } });
 });
 
-router.get('/marketplace/my-cargo', requireAuth, (_req: Request, res: Response) => {
-  res.json({ myCargo: [], quotesReceived: {} });
+router.get('/marketplace/my-cargo', requireAuth(), async (req: Request, res: Response) => {
+  const auth = (req as any).auth;
+  const clerkId = auth?.userId as string;
+  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  const user = await prisma.user.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId, email: `${clerkId}@local.dev` },
+  });
+  const myCargo = await prisma.cargo.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, title: true, status: true, createdAt: true },
+  });
+  res.json({ myCargo, quotesReceived: {} });
 });
 
 router.get('/marketplace/my-quotes', requireAuth, (_req: Request, res: Response) => {
   res.json({ myQuotes: [] });
 });
 
-router.get('/marketplace/active-deals', requireAuth, (_req: Request, res: Response) => {
-  res.json({ activeDeals: [] });
+router.get('/marketplace/active-deals', requireAuth(), async (req: Request, res: Response) => {
+  const auth = (req as any).auth;
+  const clerkId = auth?.userId as string;
+  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  const user = await prisma.user.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId, email: `${clerkId}@local.dev` },
+  });
+  const deals = await prisma.deal.findMany({
+    where: { OR: [{ shipperId: user.id }, { transporterId: user.id }] },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+    select: { id: true, status: true, progress: true, createdAt: true },
+  });
+  res.json({ activeDeals: deals });
 });
 
 export default router;
