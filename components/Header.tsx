@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Bell, MessageCircle, User, Globe } from 'lucide-react';
 import { useI18nStore } from '@/store/useI18nStore';
 import { useEffect, useRef, useState } from 'react';
+import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/nextjs';
 
 export default function Header() {
   const language = useI18nStore((s) => s.language);
@@ -64,9 +65,14 @@ export default function Header() {
                 </div>
               )}
             </div>
-            <Link href="/settings" className="hover:text-white transition-colors" aria-label="Profile">
-              <User className="w-4 h-4" />
-            </Link>
+            <SignedOut>
+              <SignInButton>
+                <button className="glass-border hover:bg-white/5 transition-colors flex items-center gap-2 px-2 py-1 rounded text-xs text-white">Sign in</button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
         </nav>
       </div>

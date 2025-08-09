@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { createSocketServer } from './ws/index.js';
 import { apiLimiter } from './lib/rateLimit.js';
 import { logger } from './lib/logger.js';
+import { clerkMiddleware } from './util/clerk.js';
 
 // Routers
 import homeRouter from './routes/home.js';
@@ -21,6 +22,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
 app.use(apiLimiter);
+app.use(clerkMiddleware);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

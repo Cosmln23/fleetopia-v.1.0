@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from '../util/clerk.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -15,25 +16,25 @@ const createSchema = z.object({
   totalPrice: z.number().nonnegative().optional(),
 });
 
-router.post('/cargo/create', (req, res) => {
+router.post('/cargo/create', requireAuth, (req, res) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Invalid input' });
   return res.json({ success: true, cargoId: 'demo-' + Math.random().toString(36).slice(2), pricePerKg: 0 });
 });
 
-router.put('/cargo/:id/update', (_req, res) => {
+router.put('/cargo/:id/update', requireAuth, (_req, res) => {
   res.json({ success: true });
 });
 
-router.delete('/cargo/:id', (_req, res) => {
+router.delete('/cargo/:id', requireAuth, (_req, res) => {
   res.json({ success: true });
 });
 
-router.post('/cargo/:id/save-draft', (_req, res) => {
+router.post('/cargo/:id/save-draft', requireAuth, (_req, res) => {
   res.json({ draftId: 'draft-' + Math.random().toString(36).slice(2) });
 });
 
-router.post('/cargo/:id/ignore', (_req, res) => {
+router.post('/cargo/:id/ignore', requireAuth, (_req, res) => {
   res.json({ success: true });
 });
 

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { requireAuth } from '../util/clerk.js';
 
 const router = Router();
 
@@ -11,15 +12,15 @@ router.get('/marketplace/all-offers', (req, res) => {
   res.json({ cargo: data, pagination: { total: data.length, pages: 1 } });
 });
 
-router.get('/marketplace/my-cargo', (_req, res) => {
+router.get('/marketplace/my-cargo', requireAuth, (_req, res) => {
   res.json({ myCargo: [], quotesReceived: {} });
 });
 
-router.get('/marketplace/my-quotes', (_req, res) => {
+router.get('/marketplace/my-quotes', requireAuth, (_req, res) => {
   res.json({ myQuotes: [] });
 });
 
-router.get('/marketplace/active-deals', (_req, res) => {
+router.get('/marketplace/active-deals', requireAuth, (_req, res) => {
   res.json({ activeDeals: [] });
 });
 

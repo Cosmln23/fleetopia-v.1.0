@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { Package, Search, MapPin, ArrowRight, Star, PlayCircle, Zap } from 'lucide-react';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
 import { useT } from '@/utils/i18n';
@@ -19,6 +20,14 @@ export default function HomePage() {
           <Link href="/marketplace?tab=ALL" className="hover:text-white transition-colors flex items-center gap-2 text-sm text-gray-400 px-6 py-2 slide-right delay-1000">
             <Search className="w-4 h-4" /> {t("I'm looking for cargo to transport")}
           </Link>
+          <SignedOut>
+            <SignInButton>
+              <button className="glass-border hover:bg-white/5 transition-all text-sm text-white rounded-lg px-6 py-2">Sign in</button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
       </section>
 

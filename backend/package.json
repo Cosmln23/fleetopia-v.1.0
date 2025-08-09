@@ -12,6 +12,8 @@
     "seed": "tsx src/seed.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.30.0",
+    "@prisma/client": "^5.22.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
@@ -28,5 +30,3 @@
     "typescript": "^5.4.5"
   }
 }
-
-

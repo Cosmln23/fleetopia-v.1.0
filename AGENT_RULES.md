@@ -3,6 +3,8 @@
 
 > **⚠️ OBLIGATORIU:** Citește integral acest fișier la începutul **fiecărei** sesiuni noi. Confirmă în primul răspuns: _„Am citit AGENT_RULES.md și voi respecta regulile.”_
 
+> **⚠️ OBLIGATORIU:** Citește integral acest fișier la începutul **fiecărei** sesiuni noi. Confirmă în primul răspuns: _„Am citit AGENT_RULES.md și voi respecta regulile.”_
+> **🔴 NOTĂ SUPLIMENTARĂ:** Dacă în timpul execuției apare o eroare sau nu reușești să finalizezi cerința, este OBLIGATORIU să o raportezi clar și complet, fără să o eviți sau să „sari peste” pași doar pentru a finaliza mai repede. Calitatea și corectitudinea sunt prioritare în fața vitezei. Evită să omiți orice detaliu esențial sau să execuți parțial fără confirmare explicită.
 ---
 
 ## 0) Protocol de pornire (de fiecare dată)
