@@ -9,6 +9,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2FjcmVkLW11ZGZpc2gtNC5jbGVyay5hY2NvdW50cy5kZXYk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,11 +38,6 @@ jobs:
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-
-      - name: Start app (background) and wait
-        run: npm run start & npx wait-on http://localhost:3000
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2FjcmVkLW11ZGZpc2gtNC5jbGVyay5hY2NvdW50cy5kZXYk
 
       - name: Test E2E (Playwright)
         run: npm run test:e2e
