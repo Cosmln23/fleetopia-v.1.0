@@ -1,5 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Fleetopia Frontend (Trial/Pro UI) — App Router',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.className} pb-20`}> {/* bottom padding for fixed bottom nav */}

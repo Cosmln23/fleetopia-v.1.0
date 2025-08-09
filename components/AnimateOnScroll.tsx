@@ -1,8 +1,9 @@
 "use client";
 
+import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 
-export default function AnimateOnScroll({ className = '', children }: { className?: string; children: React.ReactNode; }) {
+export default function AnimateOnScroll({ className = '', children }: { className?: string; children: ReactNode; }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
