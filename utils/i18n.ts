@@ -106,7 +106,7 @@ const translations: Record<Language, Record<string, string>> = {
     "Total per Mile:": "Total pe milă:",
     "Save Settings": "Salvează",
     Reset: "Reset",
-    Cancel: "Renunță",
+    // Note: duplicate keys avoided
     Settings: "Setări",
     "Manage your account, permissions, and application preferences": "Gestionează contul, permisiunile și preferințele aplicației",
     "User Level": "Nivel utilizator",
