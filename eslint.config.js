@@ -8,7 +8,9 @@ import eslintImport from "eslint-plugin-import";
 import globals from "globals";
 
 export default [
-  // Paths to ignore
+  // Paths to ignor
+  // 
+  //e
   {
     ignores: [
       "node_modules/",
