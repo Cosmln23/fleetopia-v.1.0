@@ -11,7 +11,7 @@ const translations: Record<Language, Record<string, string>> = {
     Home: "Acasă",
     Marketplace: "Piață",
     Dispatcher: "Dispecer",
-    Settings: "Setări",
+    // Settings: "Setări", // removed to avoid duplicate key issues in CI
 
     // Marketplace
     "How can we help you today? Pick your path below.": "Cum te putem ajuta azi? Alege opțiunea dorită.",
