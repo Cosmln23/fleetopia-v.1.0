@@ -4,23 +4,71 @@ import prisma from '../lib/prisma';
 const router = Router();
 
 router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
+  // Query params
   const search = String(req.query.search || '').trim();
-  const cargos = await prisma.cargo.findMany({
-    where: {
-      status: 'ACTIVE',
-      ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
-    },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true, title: true, urgency: true, totalPrice: true },
-    take: 50,
-  });
+  const type = String(req.query.type || '').trim().toUpperCase();
+  const urgency = String(req.query.urgency || '').trim().toUpperCase();
+  const minPrice = req.query.minPrice != null ? Number(req.query.minPrice) : undefined;
+  const maxPrice = req.query.maxPrice != null ? Number(req.query.maxPrice) : undefined;
+  const sortBy = String(req.query.sortBy || '').trim().toLowerCase();
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+
+  const where: any = {
+    status: 'ACTIVE',
+    ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
+  };
+  if (type) {
+    where.type = type; // Prisma enum validation will apply; ignore if invalid
+  }
+  if (urgency) {
+    where.urgency = urgency;
+  }
+  if (minPrice != null || maxPrice != null) {
+    where.totalPrice = {
+      ...(minPrice != null ? { gte: minPrice } : {}),
+      ...(maxPrice != null ? { lte: maxPrice } : {}),
+    };
+  }
+
+  let orderBy: any = { createdAt: 'desc' };
+  switch (sortBy) {
+    case 'price_asc':
+      orderBy = { totalPrice: 'asc' };
+      break;
+    case 'price_desc':
+      orderBy = { totalPrice: 'desc' };
+      break;
+    case 'created_asc':
+      orderBy = { createdAt: 'asc' };
+      break;
+    case 'created_desc':
+    default:
+      orderBy = { createdAt: 'desc' };
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [total, cargos] = await Promise.all([
+    prisma.cargo.count({ where }),
+    prisma.cargo.findMany({
+      where,
+      orderBy,
+      select: { id: true, title: true, urgency: true, totalPrice: true },
+      skip,
+      take: limit,
+    }),
+  ]);
+
   const mapped = cargos.map((c: any) => ({
     id: c.id,
     title: c.title,
     urgency: String(c.urgency).toLowerCase(),
-    price: c.totalPrice ? Number(c.totalPrice) : null,
+    price: c.totalPrice != null ? Number(c.totalPrice) : null,
   }));
-  res.json({ cargo: mapped, pagination: { total: mapped.length, pages: 1 } });
+
+  const pages = Math.max(1, Math.ceil(total / limit));
+  res.json({ cargo: mapped, pagination: { total, pages, page, limit } });
 });
 
 router.get('/marketplace/my-cargo', async (req: Request, res: Response) => {
@@ -34,14 +82,50 @@ router.get('/marketplace/my-cargo', async (req: Request, res: Response) => {
   const myCargo = await prisma.cargo.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
-    select: { id: true, title: true, status: true, createdAt: true },
+    select: { id: true, title: true, status: true, createdAt: true, _count: { select: { quotes: true } } },
   });
-  res.json({ myCargo, quotesReceived: {} });
+  const quotesReceived = myCargo.reduce((acc: Record<string, number>, c: any) => {
+    acc[c.id] = (c._count?.quotes as number) ?? 0;
+    return acc;
+  }, {} as Record<string, number>);
+  const projected = myCargo.map((c: any) => ({ id: c.id, title: c.title, status: c.status, createdAt: c.createdAt }));
+  res.json({ myCargo: projected, quotesReceived });
 });
 
-router.get('/marketplace/my-quotes', (_req: Request, res: Response) => {
-  // Not in current scope; return empty contract without auth to avoid server errors
-  res.json({ myQuotes: [] });
+router.get('/marketplace/my-quotes', async (req: Request, res: Response) => {
+  const clerkId = (req as any).auth?.userId as string | undefined;
+  if (!clerkId) return res.json({ myQuotes: [] });
+
+  const user = await prisma.user.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId, email: `${clerkId}@local.dev` },
+  });
+
+  const quotes = await prisma.quote.findMany({
+    where: { transporterId: user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+    select: {
+      id: true,
+      cargoId: true,
+      price: true,
+      status: true,
+      createdAt: true,
+      cargo: { select: { id: true, title: true, status: true } },
+    },
+  });
+
+  const myQuotes = quotes.map((q: any) => ({
+    quoteId: q.id,
+    cargoId: q.cargoId,
+    cargo: q.cargo,
+    price: Number(q.price),
+    status: q.status,
+    createdAt: q.createdAt,
+  }));
+
+  res.json({ myQuotes });
 });
 
 router.get('/marketplace/active-deals', async (req: Request, res: Response) => {

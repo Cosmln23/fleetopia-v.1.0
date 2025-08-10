@@ -8,7 +8,7 @@ import logger from './lib/logger';
 import { clerkMiddleware } from '@clerk/express';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env.local' });
+dotenv.config({ path: '../.env' });
 
 // Routers
 import homeRouter from './routes/home';
@@ -41,7 +41,7 @@ app.use((req, _res, next) => {
 // Clerk middleware real
 app.use(clerkMiddleware());
 
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/health', (_req, res) => res.json({ ok: true }));
 
 // Mount routers under /api
 app.use('/api', homeRouter);

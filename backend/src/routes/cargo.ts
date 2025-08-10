@@ -17,10 +17,45 @@ const createSchema = z.object({
   totalPrice: z.number().nonnegative().optional(),
 });
 
-router.post('/cargo/create', requireAuth, (req: Request, res: Response) => {
+router.post('/cargo/create', requireAuth(), async (req: Request, res: Response) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: 'Invalid input' });
-  return res.json({ success: true, cargoId: 'demo-' + Math.random().toString(36).slice(2), pricePerKg: 0 });
+
+  const auth = (req as any).auth;
+  const clerkId = auth?.userId as string;
+  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+  const user = await prisma.user.upsert({
+    where: { clerkId },
+    update: {},
+    create: { clerkId, email: `${clerkId}@local.dev` },
+  });
+
+  const { title, type, weight, volume, vehicleType, urgency, fromAddress, toAddress, totalPrice } = parsed.data;
+  let pricePerKg: number | null = null;
+  if (typeof totalPrice === 'number' && typeof weight === 'number' && weight > 0) {
+    pricePerKg = totalPrice / weight;
+  }
+
+  const created = await prisma.cargo.create({
+    data: {
+      userId: user.id,
+      title,
+      type: (type as any) || undefined,
+      weight,
+      volume: volume ?? undefined,
+      vehicleType: (vehicleType as any) || undefined,
+      urgency: (urgency as any) || undefined,
+      fromAddress,
+      toAddress,
+      totalPrice: totalPrice ?? undefined,
+      pricePerKg: pricePerKg ?? undefined,
+      status: 'ACTIVE',
+    },
+    select: { id: true, pricePerKg: true },
+  });
+
+  return res.json({ success: true, cargoId: created.id, pricePerKg: created.pricePerKg ? Number(created.pricePerKg) : null });
 });
 
 // 5.4 — Quick Post (input minim, create draft cargo fast)
