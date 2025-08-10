@@ -6,10 +6,18 @@ const router = Router();
 router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
   // Query params
   const search = String(req.query.search || '').trim();
-  const type = String(req.query.type || '').trim().toUpperCase();
-  const urgency = String(req.query.urgency || '').trim().toUpperCase();
-  const minPrice = req.query.minPrice != null ? Number(req.query.minPrice) : undefined;
-  const maxPrice = req.query.maxPrice != null ? Number(req.query.maxPrice) : undefined;
+  const typeRaw = String(req.query.type || '').trim().toUpperCase();
+  const urgencyRaw = String(req.query.urgency || '').trim().toUpperCase();
+  const allowedTypes = ['GENERAL', 'FRAGILE', 'LIQUID', 'REFRIGERATED', 'HAZARDOUS', 'BULK', 'CONTAINER', 'PALLETS'];
+  const allowedUrgency = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+  const type = allowedTypes.includes(typeRaw) ? typeRaw : undefined;
+  const urgency = allowedUrgency.includes(urgencyRaw) ? urgencyRaw : undefined;
+  const toNum = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  };
+  const minPrice = req.query.minPrice != null ? toNum(req.query.minPrice) : undefined;
+  const maxPrice = req.query.maxPrice != null ? toNum(req.query.maxPrice) : undefined;
   const sortBy = String(req.query.sortBy || '').trim().toLowerCase();
   const page = Math.max(1, Number(req.query.page) || 1);
   const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
@@ -18,12 +26,8 @@ router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
     status: 'ACTIVE',
     ...(search ? { title: { contains: search, mode: 'insensitive' } } : {}),
   };
-  if (type) {
-    where.type = type; // Prisma enum validation will apply; ignore if invalid
-  }
-  if (urgency) {
-    where.urgency = urgency;
-  }
+  if (type) where.type = type;
+  if (urgency) where.urgency = urgency;
   if (minPrice != null || maxPrice != null) {
     where.totalPrice = {
       ...(minPrice != null ? { gte: minPrice } : {}),
