@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import prisma from '../lib/prisma';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, UrgencyLevel } from '@prisma/client';
 
 const router = Router();
 
@@ -27,7 +27,7 @@ router.get('/loads/quick-search', async (req: Request, res: Response) => {
     }),
   ]);
 
-  const items = cargos.map((c) => ({
+  const items = cargos.map((c: { id: string; title: string; urgency: UrgencyLevel; totalPrice: Prisma.Decimal | null }) => ({
     id: c.id,
     title: c.title,
     urgency: String(c.urgency).toLowerCase(),
