@@ -27,14 +27,7 @@ router.get('/loads/quick-search', async (req: Request, res: Response) => {
     }),
   ]);
 
-  type CargoSummary = {
-    id: string;
-    title: string;
-    urgency: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-    totalPrice: number | null;
-  };
-
-  const items = cargos.map((c: CargoSummary) => ({
+  const items = cargos.map((c) => ({
     id: c.id,
     title: c.title,
     urgency: String(c.urgency).toLowerCase(),

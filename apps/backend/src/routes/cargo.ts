@@ -82,6 +82,8 @@ router.post('/cargo/quick-post', requireAuth(), async (req: Request, res: Respon
       title: parsed.data.title,
       fromAddress: parsed.data.fromAddress,
       toAddress: parsed.data.toAddress,
+      // Minimal required defaults for schema compatibility
+      weight: 1,
       status: 'ACTIVE',
     },
     select: { id: true },

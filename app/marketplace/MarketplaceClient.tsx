@@ -6,6 +6,7 @@ import Modal from '@/components/Modal';
 import { MapPin } from 'lucide-react';
 import { useT } from '@/utils/i18n';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
+import { z } from 'zod';
 
 type Cargo = {
   id: number;
@@ -37,6 +38,9 @@ export default function MarketplaceClient() {
   const [filters, setFilters] = useState({ country: '', sort: 'newest', type: '', urgency: '', date: '', min: '', max: '' });
   const [addOpen, setAddOpen] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [myCargo, setMyCargo] = useState<Array<{ id: string; title: string; status: string; createdAt: string }>>([]);
+  const [quotesReceived, setQuotesReceived] = useState<Record<string, number>>({});
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -45,6 +49,76 @@ export default function MarketplaceClient() {
     if (add === '1') setAddOpen(true);
     if (tab && ['ALL', 'MY_CARGO', 'MY_QUOTES', 'ACTIVE_DEALS'].includes(tab)) setActiveTab(tab);
   }, [searchParams]);
+
+  async function loadMyCargo() {
+    try {
+      const res = await fetch('/api/marketplace/my-cargo', { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      setMyCargo(Array.isArray(data?.myCargo) ? data.myCargo : []);
+      setQuotesReceived(typeof data?.quotesReceived === 'object' && data?.quotesReceived !== null ? data.quotesReceived : {});
+    } catch (err) {
+      // silent
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'MY_CARGO') {
+      loadMyCargo();
+    }
+  }, [activeTab]);
+
+  const createSchema = z.object({
+    title: z.string().min(1),
+    type: z.string().optional(),
+    weight: z.preprocess((v) => Number(v), z.number().positive()),
+    volume: z.preprocess((v) => (v === '' || v == null ? undefined : Number(v)), z.number().positive().optional()),
+    fromAddress: z.string().min(1),
+    toAddress: z.string().min(1),
+    totalPrice: z.preprocess((v) => (v === '' || v == null ? undefined : Number(v)), z.number().nonnegative().optional()),
+  });
+
+  async function onAddCargoSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      const fd = new FormData(e.currentTarget);
+      const raw = {
+        title: String(fd.get('title') || ''),
+        type: (fd.get('type') || undefined) as undefined | string,
+        weight: fd.get('weight'),
+        volume: fd.get('volume'),
+        fromAddress: String(fd.get('fromAddress') || ''),
+        toAddress: String(fd.get('toAddress') || ''),
+        totalPrice: fd.get('totalPrice'),
+      };
+      const parsed = createSchema.safeParse(raw);
+      if (!parsed.success) {
+        const first = parsed.error.errors?.[0];
+        alert(first?.message || 'Invalid input');
+        return;
+      }
+      const res = await fetch('/api/cargo/create', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(parsed.data),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) {
+        alert(data?.error || 'Failed to create cargo');
+        return;
+      }
+      setAddOpen(false);
+      setActiveTab('MY_CARGO');
+      await loadMyCargo();
+      alert('Cargo created successfully');
+    } catch (err) {
+      alert('Unexpected error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   const filtered = useMemo(() => {
     let list = demoCargo.filter((c) => c.title.toLowerCase().includes(query.toLowerCase()));
@@ -144,7 +218,7 @@ export default function MarketplaceClient() {
 
         <AnimateOnScroll>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((c) => (
+            {activeTab !== 'MY_CARGO' && filtered.map((c) => (
               <div key={c.id} className="glass-card rounded-xl p-6 hover:bg-white/5 transition-all cursor-pointer relative group" onClick={() => setDetailId(c.id)}>
                 <div className="absolute top-4 right-4">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium transition-all bg-white/10 text-white ${c.urgency === 'High' ? 'group-hover:bg-red-500 group-hover:text-white' : c.urgency === 'Medium' ? 'group-hover:bg-yellow-500 group-hover:text-black' : 'group-hover:bg-green-500 group-hover:text-white'}`}>{c.urgency}</span>
@@ -172,22 +246,35 @@ export default function MarketplaceClient() {
                 </div>
               </div>
             ))}
+
+            {activeTab === 'MY_CARGO' && myCargo.map((c) => (
+              <div key={c.id} className="glass-card rounded-xl p-6 hover:bg-white/5 transition-all cursor-default relative">
+                <div className="flex items-start justify-between mb-4">
+                  <h3 className="text-sm font-medium text-white">{c.title}</h3>
+                  <span className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleString()}</span>
+                </div>
+                <div className="text-xs text-gray-400 mb-4">Status: {c.status}</div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">Quotes: {quotesReceived[c.id] ?? 0}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </AnimateOnScroll>
       </div>
 
       <Modal open={addOpen} onClose={() => setAddOpen(false)} title={t('Add New Cargo')}>
-        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setAddOpen(false); }}>
+        <form className="space-y-6" onSubmit={onAddCargoSubmit}>
           <div>
             <h3 className="text-base font-medium text-gray-300 mb-3">{t('Cargo Details')}</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Cargo Title</label>
-                <input className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter cargo title" />
+                <input name="title" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter cargo title" />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Cargo Type</label>
-                <select className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
+                <select name="type" className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
                   <option value="">Select cargo type</option>
                   <option value="pallets">Pallets</option>
                   <option value="container">Container</option>
@@ -198,11 +285,11 @@ export default function MarketplaceClient() {
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Weight (kg) *</label>
-                <input type="number" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter weight" required />
+                <input name="weight" type="number" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter weight" required />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">Volume (m³)</label>
-                <input type="number" step="0.1" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter volume (optional)" />
+                <input name="volume" type="number" step="0.1" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter volume (optional)" />
               </div>
             </div>
           </div>
@@ -212,7 +299,7 @@ export default function MarketplaceClient() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-3">
                 <h4 className="text-xs text-gray-400 font-medium">FROM</h4>
-                <input className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="From Address" />
+                <input name="fromAddress" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="From Address" />
                 <input className="glass-input w-full px-3 py-2 rounded-lg text:white placeholder-gray-400" placeholder="City" />
                 <input className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Postal Code" />
                 <select className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
@@ -227,7 +314,7 @@ export default function MarketplaceClient() {
               </div>
               <div className="space-y-3">
                 <h4 className="text-xs text-gray-400 font-medium">TO</h4>
-                <input className="glass-input w-full px-3 py-2 rounded-lg text:white placeholder-gray-400" placeholder="To Address" />
+                <input name="toAddress" className="glass-input w-full px-3 py-2 rounded-lg text:white placeholder-gray-400" placeholder="To Address" />
                 <input className="glass-input w-full px-3 py-2 rounded-lg text:white placeholder-gray-400" placeholder="City" />
                 <input className="glass-input w-full px-3 py-2 rounded-lg text:white placeholder-gray-400" placeholder="Postal Code" />
                 <select className="glass-input w-full px-3 py-2 rounded-lg text:white bg-transparent">
@@ -248,11 +335,11 @@ export default function MarketplaceClient() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-gray-400 mb-2">{t('Budget (EUR)')}</label>
-                <input type="number" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter price" />
+                <input name="totalPrice" type="number" className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400" placeholder="Enter price" />
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-2">{t('Special Requirements')}</label>
-                <select className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
+                <select name="requirements" className="glass-input w-full px-3 py-2 rounded-lg text-white bg-transparent">
                   <option value="">{t('No special requirements')}</option>
                   <option value="refrigerated">Refrigerated transport</option>
                   <option value="fragile">Fragile goods</option>
@@ -263,13 +350,13 @@ export default function MarketplaceClient() {
             </div>
             <div className="mt-2">
               <label className="block text-xs text-gray-400 mb-2">{t('Additional Notes')}</label>
-              <textarea rows={4} className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400 resize-none" placeholder="Add any additional information or special instructions..."></textarea>
+              <textarea name="notes" rows={4} className="glass-input w-full px-3 py-2 rounded-lg text-white placeholder-gray-400 resize-none" placeholder="Add any additional information or special instructions..."></textarea>
             </div>
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-700">
             <button type="button" onClick={() => setAddOpen(false)} className="px-6 py-2 text-sm text-gray-400 hover:text-white">{t('Cancel')}</button>
-            <button type="submit" className="glass-border hover:bg-white/5 transition-all px-6 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg">{t('Add Cargo Submit')}</button>
+            <button type="submit" disabled={isSubmitting} className="glass-border hover:bg-white/5 transition-all px-6 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg">{isSubmitting ? 'Posting…' : t('Add Cargo Submit')}</button>
           </div>
         </form>
       </Modal>
