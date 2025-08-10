@@ -151,11 +151,118 @@ Oprește implementarea. Propune **2 opțiuni** cu pro/contra, spune ce informaț
 - Nu schimbi stack, stil sau arhitectură fără cerere explicită.
 
 ---
+REGULA #11 — Separare Frontend/Backend (Monorepo, UI protejat)
 
-### Anexe
+Scop: Backend-ul evoluează independent. UI este intangibil până la aprobare explicită.
 
-**Template de răspuns (copy‑paste):**
-```md
+
+11.1 Scope permis / interzis
+
+Permis (doar acestea):
+
+    apps/backend/**
+
+    pnpm-workspace.yaml
+
+    package.json (root; doar workspaces/scripts backend)
+
+    .github/workflows/backend-ci.yml
+
+    apps/backend/.env + apps/backend/.env.example (fără secrete)
+
+Interzis (STOP instant dacă apar în diff):
+
+    app/**, components/**, styles/**, public/**, app/api/**
+
+    next.config.*, .eslintrc*, tailwind.config*
+
+    Upgrade dependențe UI sau refactor UI fără cerere!!!! astepti confirmare sau intrebi!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+REGULA #12 — Taskuri API: Date reale, fără mock (UI protejat)
+
+Scop: Orice pas care implică API → implementează pe backend real (DB/Prisma) și elimină mock. UI rămâne neatins până la “APROBAT SWITCH UI”.
+12.1 Scope permis / interzis
+
+Permis: apps/backend/**, pnpm-workspace.yaml, package.json (root – scripturi backend), .github/workflows/backend-ci.yml, apps/backend/.env, apps/backend/.env.example.
+Interzis: app/**, components/**, public/**, styles/**, app/api/**, next.config.*, .eslintrc*. Dacă apar în diff → STOP & cere aprobare.
+12.2 Politica „NO MOCK”
+
+    Elimină toate sursele mock/in-memory/fixtures din backend pentru endpoint-urile lucrate.
+
+    Fără seed de demo în prod. Dacă e nevoie de seed doar pentru dezvoltare: SEED_DEMO=false implicit; activ doar manual.
+
+    Contractele JSON rămân identice cu cele consumate de UI (nume câmpuri/forme/enum-uri).
+
+12.3 Auth & securitate
+
+    @clerk/express + requireAuth() pe rutele user-scoped.
+
+    .env backend: CLERK_SECRET_KEY, CLERK_PUBLISHABLE_KEY, CLERK_ISSUER, CLERK_ALLOWED_ORIGINS.
+
+    Rate limit pe rutele publice; CORS strict (localhost:3000 în dev).
+
+12.4 DB & Prisma
+
+    Migrații aditive; fără breaking fără aprobare.
+
+    pnpm --filter @fleetopia/backend run prisma:generate && ... migrate:deploy înainte de test.
+
+    Tip Decimal la API = string în request/response (conversie în service).
+
+12.5 Validare & erori
+
+    Validează payload cu zod (sau validatorul proiectului).
+
+    Răspunde corect: 400 (invalid), 401/403 (auth), 404 (not found), 429 (rate limit); 500 doar pe excepții neprevăzute.
+
+    Logging JSON (Winston): info pentru access, error cu stack; fără PII în loguri.
+
+12.6 Parametri standard (consistență)
+
+    Paginare: page, limit (default: page=1, limit=20).
+
+    Sortare: sortBy (ex. created_desc).
+
+    Filtre: păstrează exact cheile deja folosite de UI.
+
+    Nimic nou în schema răspunsului fără aprobare.
+
+12.7 Protocol de execuție (fiecare endpoint)
+
+    Prezintă plan scurt + fișiere atinse → așteaptă APROBAT.
+
+    Implementează doar în backend, fără touch UI.
+
+    Smoke tests (dev):
+
+    curl.exe -sS http://localhost:3001/health
+    curl.exe -sS "http://localhost:3001/api/marketplace/all-offers?page=1&limit=5"
+    curl.exe -sS -H "Authorization: Bearer <TOKEN>" http://localhost:3001/api/marketplace/my-cargo
+
+    Dacă endpoint e POST/PUT: testează cu payload minim valid (zod) și confirmă inserarea prin GET.
+
+    Commit unic: chore(backend): <endpoint> real (no mocks, no UI changes) + atașează output-ul testelor.
+
+12.8 “Switch UI → backend” (pas separat)
+
+    Până la aprobare, UI rămâne pe mock/proxy.
+
+    La „APROBAT SWITCH UI”: PR mic care schimbă doar URL-urile/headers (fără componente).
+
+12.9 Criterii de acceptare (task API)
+
+    Niciun mock rămas pe endpoint-urile atinse.
+
+    Contract JSON identic cu cel folosit de UI.
+
+    Smoke tests = 200/201 și date vizibile prin GET.
+
+    git diff --name-only doar în scope permis.
+
+    UI neatins și build/dev OK.
+    
 🎯 CERINȚA ÎNȚELEASĂ: …
 
 🔧 MODIFICAREA FĂCUTĂ:
