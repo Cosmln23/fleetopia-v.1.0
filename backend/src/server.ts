@@ -19,6 +19,7 @@ import dealsRouter from './routes/deals';
 import agentRouter from './routes/agent';
 import fleetRouter from './routes/fleet';
 import settingsRouter from './routes/settings';
+import loadsRouter from './routes/loads';
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api', dealsRouter);
 app.use('/api', agentRouter);
 app.use('/api', fleetRouter);
 app.use('/api', settingsRouter);
+app.use('/api', loadsRouter);
 
 // Error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

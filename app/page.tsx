@@ -8,13 +8,15 @@ import { useT } from '@/utils/i18n';
 
 export default function HomePage() {
   const t = useT();
+  
+
   return (
     <>
       <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1659115516377-25ed306a3551?w=2560&q=80')] bg-cover bg-center">
         <h1 className="text-4xl md:text-7xl font-normal text-white tracking-tight text-center slide-up delay-400">Fleetopia</h1>
         <p className="max-w-md text-2xl text-gray-400 text-center mb-8 fade-in delay-600">{t('How can we help you today? Pick your path below.')}</p>
         <div className="flex gap-4 items-center">
-          <Link href="/marketplace?add=1&tab=MY_CARGO" className="glass-border hover:bg-white/5 transition-all flex items-center gap-2 text-sm font-medium bg-gray-900 text-white rounded-lg px-6 py-2 slide-left delay-800">
+          <Link href="/marketplace?tab=MY_CARGO" className="glass-border hover:bg-white/5 transition-all flex items-center gap-2 text-sm font-medium bg-gray-900 text-white rounded-lg px-6 py-2 slide-left delay-800">
             <Package className="w-4 h-4" /> {t('I have cargo to transport')}
           </Link>
           <Link href="/marketplace?tab=ALL" className="hover:text-white transition-colors flex items-center gap-2 text-sm text-gray-400 px-6 py-2 slide-right delay-1000">
@@ -38,12 +40,12 @@ export default function HomePage() {
         </AnimateOnScroll>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { title: t('I have cargo to transport'), icon: <Package className="w-5 h-5" />, cta: t('Get started') },
-            { title: t("I'm looking for cargo to transport"), icon: <Search className="w-5 h-5" />, cta: t('Search loads') },
-            { title: t('Track My Shipments'), icon: <MapPin className="w-5 h-5" />, cta: t('View shipments') },
+            { title: t('I have cargo to transport'), icon: <Package className="w-5 h-5" />, cta: t('Get started'), href: "/marketplace?tab=MY_CARGO" },
+            { title: t("I'm looking for cargo to transport"), icon: <Search className="w-5 h-5" />, cta: t('Search loads'), href: "/marketplace?tab=ALL" },
+            { title: t('Track My Shipments'), icon: <MapPin className="w-5 h-5" />, cta: t('View shipments'), href: "/marketplace?tab=ACTIVE_DEALS" },
           ].map((card) => (
             <AnimateOnScroll key={card.title}>
-              <div className="glass-card p-6 rounded-xl hover:bg-white/5 transition-all cursor-pointer">
+              <Link href={card.href} className="glass-card p-6 rounded-xl hover:bg-white/5 transition-all block">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 flex bg-gray-400/10 rounded-lg items-center justify-center">{card.icon}</div>
                   <h3 className="font-medium text-white text-sm md:text-base">{card.title}</h3>
@@ -52,7 +54,7 @@ export default function HomePage() {
                   <span>{card.cta}</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
-              </div>
+              </Link>
             </AnimateOnScroll>
           ))}
         </div>

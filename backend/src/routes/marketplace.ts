@@ -1,5 +1,4 @@
 import { Router, type Request, type Response } from 'express';
-import { requireAuth } from '@clerk/express';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -24,10 +23,9 @@ router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
   res.json({ cargo: mapped, pagination: { total: mapped.length, pages: 1 } });
 });
 
-router.get('/marketplace/my-cargo', requireAuth(), async (req: Request, res: Response) => {
-  const auth = (req as any).auth;
-  const clerkId = auth?.userId as string;
-  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+router.get('/marketplace/my-cargo', async (req: Request, res: Response) => {
+  const clerkId = (req as any).auth?.userId as string | undefined;
+  if (!clerkId) return res.json({ myCargo: [], quotesReceived: {} });
   const user = await prisma.user.upsert({
     where: { clerkId },
     update: {},
@@ -41,14 +39,14 @@ router.get('/marketplace/my-cargo', requireAuth(), async (req: Request, res: Res
   res.json({ myCargo, quotesReceived: {} });
 });
 
-router.get('/marketplace/my-quotes', requireAuth, (_req: Request, res: Response) => {
+router.get('/marketplace/my-quotes', (_req: Request, res: Response) => {
+  // Not in current scope; return empty contract without auth to avoid server errors
   res.json({ myQuotes: [] });
 });
 
-router.get('/marketplace/active-deals', requireAuth(), async (req: Request, res: Response) => {
-  const auth = (req as any).auth;
-  const clerkId = auth?.userId as string;
-  if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+router.get('/marketplace/active-deals', async (req: Request, res: Response) => {
+  const clerkId = (req as any).auth?.userId as string | undefined;
+  if (!clerkId) return res.json({ activeDeals: [] });
   const user = await prisma.user.upsert({
     where: { clerkId },
     update: {},

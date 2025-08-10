@@ -1,21 +1,42 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 export const dynamic = 'force-dynamic';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await auth();
     const token = await session.getToken?.();
+    const incomingAuth = req.headers.get('authorization') || '';
+    const headers: Record<string, string> = {};
+    if (incomingAuth) {
+      headers.Authorization = incomingAuth;
+    } else if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${BASE_URL}/api/marketplace/active-deals`, {
-      headers: { Authorization: `Bearer ${token ?? ''}` },
+      headers,
       cache: 'no-store',
     });
-    const data = await res.json();
+
+    let data: any = null;
+    const text = await res.text();
+    console.log('[api proxy] /marketplace/active-deals → backend', {
+      status: res.status,
+      bodyPreview: text.slice(0, 500),
+    });
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { message: text || '' };
+    }
+
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
+    console.error('[api proxy] /marketplace/active-deals error', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
