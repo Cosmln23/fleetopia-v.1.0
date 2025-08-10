@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Modal from '@/components/Modal';
 import { MapPin } from 'lucide-react';
@@ -78,7 +78,7 @@ export default function MarketplaceClient() {
     totalPrice: z.preprocess((v) => (v === '' || v == null ? undefined : Number(v)), z.number().nonnegative().optional()),
   });
 
-  async function onAddCargoSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onAddCargoSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (isSubmitting) return;
     try {
