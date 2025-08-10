@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import prisma from '../lib/prisma';
+// Avoid importing generated Prisma types that may differ across environments
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.get('/loads/quick-search', async (req: Request, res: Response) => {
     }),
   ]);
 
-  const items = cargos.map((c) => ({
+  const items = cargos.map((c: { id: string; title: string; urgency: string; totalPrice: any }) => ({
     id: c.id,
     title: c.title,
     urgency: String(c.urgency).toLowerCase(),

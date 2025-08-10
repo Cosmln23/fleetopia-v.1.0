@@ -1,10 +1,10 @@
 {
-  "name": "fleetopia-frontend",
+  "name": "fleetopia",
   "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "test": "jest",
     "dev": "next dev",
@@ -15,14 +15,15 @@
     "test:unit": "jest",
     "test:e2e": "playwright test --reporter=dot",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "dev:backend": "pnpm --filter @fleetopia/backend run dev",
+    "start:backend": "pnpm --filter @fleetopia/backend run start",
+    "migrate": "pnpm --filter @fleetopia/backend run migrate:deploy"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
-  "private": "true",
   "dependencies": {
     "@clerk/nextjs": "^6.30.0",
     "@tanstack/react-query": "^5.84.1",
@@ -30,6 +31,7 @@
     "next": "^14.2.31",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "zod": "^3.25.76",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
