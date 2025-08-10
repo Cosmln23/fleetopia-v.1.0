@@ -27,9 +27,12 @@ router.get('/loads/quick-search', async (req: Request, res: Response) => {
     }),
   ]);
 
-  type CargoSummary = Prisma.CargoGetPayload<{
-    select: { id: true; title: true; urgency: true; totalPrice: true };
-  }>;
+  type CargoSummary = {
+    id: string;
+    title: string;
+    urgency: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+    totalPrice: Prisma.Decimal | null;
+  };
 
   const items = cargos.map((c: CargoSummary) => ({
     id: c.id,
