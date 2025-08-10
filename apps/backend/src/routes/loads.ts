@@ -31,7 +31,7 @@ router.get('/loads/quick-search', async (req: Request, res: Response) => {
     id: string;
     title: string;
     urgency: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-    totalPrice: Prisma.Decimal | null;
+    totalPrice: number | null;
   };
 
   const items = cargos.map((c: CargoSummary) => ({
