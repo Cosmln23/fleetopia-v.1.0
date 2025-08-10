@@ -91,19 +91,19 @@ router.post('/cargo/quick-post', requireAuth(), async (req: Request, res: Respon
   return res.json({ success: true, draftId: created.id });
 });
 
-router.put('/cargo/:id/update', requireAuth, (_req: Request, res: Response) => {
+router.put('/cargo/:id/update', requireAuth(), (_req: Request, res: Response) => {
   res.json({ success: true });
 });
 
-router.delete('/cargo/:id', requireAuth, (_req: Request, res: Response) => {
+router.delete('/cargo/:id', requireAuth(), (_req: Request, res: Response) => {
   res.json({ success: true });
 });
 
-router.post('/cargo/:id/save-draft', requireAuth, (_req: Request, res: Response) => {
+router.post('/cargo/:id/save-draft', requireAuth(), (_req: Request, res: Response) => {
   res.json({ draftId: 'draft-' + Math.random().toString(36).slice(2) });
 });
 
-router.post('/cargo/:id/ignore', requireAuth, (_req: Request, res: Response) => {
+router.post('/cargo/:id/ignore', requireAuth(), (_req: Request, res: Response) => {
   res.json({ success: true });
 });
 

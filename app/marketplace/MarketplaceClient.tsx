@@ -41,6 +41,8 @@ export default function MarketplaceClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [myCargo, setMyCargo] = useState<Array<{ id: string; title: string; status: string; createdAt: string }>>([]);
   const [quotesReceived, setQuotesReceived] = useState<Record<string, number>>({});
+  const [allOffers, setAllOffers] = useState<Array<{ id: string; title: string; urgency: string; price: number | null }>>([]);
+  const [loadingAll, setLoadingAll] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -67,6 +69,39 @@ export default function MarketplaceClient() {
       loadMyCargo();
     }
   }, [activeTab]);
+
+  async function loadAllOffers() {
+    try {
+      setLoadingAll(true);
+      const params = new URLSearchParams();
+      if (query) params.set('search', query);
+      if (filters.type) params.set('type', String(filters.type).toUpperCase());
+      if (filters.urgency) params.set('urgency', String(filters.urgency).toUpperCase());
+      if (filters.min) params.set('minPrice', String(filters.min));
+      if (filters.max) params.set('maxPrice', String(filters.max));
+      const sortMap: Record<string, string> = {
+        'newest': 'created_desc',
+        'oldest': 'created_asc',
+        'price-high': 'price_desc',
+        'price-low': 'price_asc',
+      };
+      params.set('sortBy', sortMap[filters.sort] || 'created_desc');
+      const res = await fetch(`/api/marketplace/all-offers?${params.toString()}`, { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      setAllOffers(Array.isArray(data?.cargo) ? data.cargo : []);
+    } catch {
+      setAllOffers([]);
+    } finally {
+      setLoadingAll(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === 'ALL') {
+      loadAllOffers();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, query, filters.type, filters.urgency, filters.min, filters.max, filters.sort]);
 
   const createSchema = z.object({
     title: z.string().min(1),
@@ -218,7 +253,44 @@ export default function MarketplaceClient() {
 
         <AnimateOnScroll>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeTab !== 'MY_CARGO' && filtered.map((c) => (
+            {activeTab === 'ALL' && (loadingAll ? (
+              <div className="text-sm text-gray-400">Loading…</div>
+            ) : (
+              allOffers.map((item) => {
+                const urgencyCap = item.urgency ? (item.urgency.charAt(0).toUpperCase() + item.urgency.slice(1)) : '—';
+                const priceStr = item.price != null ? `€${Number(item.price).toLocaleString('en-US')}` : '—';
+                return (
+                  <div key={item.id} className="glass-card rounded-xl p-6 hover:bg-white/5 transition-all relative group">
+                    <div className="absolute top-4 right-4">
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium transition-all bg-white/10 text-white ${urgencyCap === 'High' ? 'group-hover:bg-red-500 group-hover:text-white' : urgencyCap === 'Medium' ? 'group-hover:bg-yellow-500 group-hover:text-black' : 'group-hover:bg-green-500 group-hover:text-white'}`}>{urgencyCap}</span>
+                    </div>
+                    <div className="flex items-start justify-between mb-4 pr-16">
+                      <h3 className="text-sm font-medium text-white">{item.title}</h3>
+                      <span className="text-xs text-gray-400">—</span>
+                    </div>
+                    <div className="space-y-3 mb-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <MapPin className="w-3 h-3 text-green-400" />
+                          <span>From: —</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <MapPin className="w-3 h-3 text-red-400" />
+                          <span>To: —</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400">— • —</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-medium text-white">{priceStr}</span>
+                      <span className="text-xs text-gray-400">by —</span>
+                    </div>
+                  </div>
+                );
+              })
+            ))}
+
+            {activeTab !== 'MY_CARGO' && activeTab !== 'ALL' && filtered.map((c) => (
               <div key={c.id} className="glass-card rounded-xl p-6 hover:bg-white/5 transition-all cursor-pointer relative group" onClick={() => setDetailId(c.id)}>
                 <div className="absolute top-4 right-4">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium transition-all bg-white/10 text-white ${c.urgency === 'High' ? 'group-hover:bg-red-500 group-hover:text-white' : c.urgency === 'Medium' ? 'group-hover:bg-yellow-500 group-hover:text-black' : 'group-hover:bg-green-500 group-hover:text-white'}`}>{c.urgency}</span>
