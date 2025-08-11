@@ -56,7 +56,7 @@ jobs:
         run: pnpm run test
 
       - name: Start backend
-        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+        run: pnpm --filter @fleetopia/backend build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
       - name: Contract tests - consumer
         run: pnpm run contract:consumer
@@ -124,7 +124,7 @@ jobs:
       - name: Build backend
         run: pnpm --filter @fleetopia/backend build
       - name: Start backend
-        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+        run: pnpm --filter @fleetopia/backend build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
       - name: Smoke API targets
         run: pnpm run check:apis
         env:
