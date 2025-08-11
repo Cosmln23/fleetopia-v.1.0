@@ -12,31 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install pnpm (corepack)
-        run: corepack prepare pnpm@10.0.0 --activate
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
           standalone: true
-
-      - name: PNPM version
-        run: pnpm -v
-
-      - name: Install
-        run: pnpm -w install --frozen-lockfile
+          run_install: true
+          run_install_cwd: .
+          run_install_args: -w --frozen-lockfile
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -50,16 +41,11 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
-      - name: Start backend for provider verification
-        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
-
       - name: Contract tests - consumer
         run: pnpm run contract:consumer
 
-      - name: Smoke API targets
-        run: pnpm run check:apis
-        env:
-          API_BASE: http://localhost:3001
+      - name: Start backend for provider verification
+        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
       - name: Contract tests - provider
         run: pnpm run contract:provider
@@ -81,25 +67,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
+
       - name: Setup Node
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Install pnpm (corepack)
-        run: corepack prepare pnpm@10.0.0 --activate
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
           standalone: true
-      - name: PNPM version
-        run: pnpm -v
-      - name: Install
-        run: pnpm -w install --frozen-lockfile
+          run_install: true
+          run_install_cwd: .
+          run_install_args: -w --frozen-lockfile
+
       - name: Validate DB logs
         run: pnpm run validate:db-logs
 
@@ -108,31 +92,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
+
       - name: Setup Node
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Install pnpm (corepack)
-        run: corepack prepare pnpm@10.0.0 --activate
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
           standalone: true
-      - name: PNPM version
-        run: pnpm -v
-      - name: Install
-        run: pnpm -w install --frozen-lockfile
+          run_install: true
+          run_install_cwd: .
+          run_install_args: -w --frozen-lockfile
+
       - name: Start backend
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+
       - name: Smoke API targets
         run: pnpm run check:apis
         env:
           API_BASE: http://localhost:3001
+
       - name: Stop backend
         if: always()
         run: pkill -f "dist/server.js" || true
