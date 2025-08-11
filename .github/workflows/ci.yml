@@ -3,6 +3,10 @@ on:
   push: { branches: [ main ] }
   pull_request: { branches: [ main ] }
 
+env:
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+  NEXT_PUBLIC_SENTRY_DSN_FRONTEND: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_FRONTEND }}
+
 jobs:
   build-and-test:
     name: build-and-test
@@ -41,6 +45,9 @@ jobs:
 
       - name: Build (root)
         run: pnpm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_SENTRY_DSN_FRONTEND: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_FRONTEND }}
 
       - name: Build backend
         run: pnpm --filter @fleetopia/backend build
@@ -73,6 +80,9 @@ jobs:
 
       - name: E2E tests
         run: pnpm run test:e2e
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_SENTRY_DSN_FRONTEND: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_FRONTEND }}
 
   validate-db-logs:
     name: validate-db-logs
