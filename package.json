@@ -12,7 +12,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "validate:db-logs": "node -e \"console.log('skip validate-db-logs for now')\""
+    "validate:db-logs": "node -e \"console.log('skip validate-db-logs for now')\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "jest",
     "test:e2e": "playwright test --reporter=dot",
@@ -25,7 +25,6 @@
     "contract:consumer": "jest __tests__/contracts --runTestsByPath __tests__/contracts/consumer.allOffers.pact.test.ts",
     "contract:provider": "jest __tests__/contracts --runTestsByPath __tests__/contracts/provider.verify.test.ts",
     "contract:test": "npm run contract:consumer && npm run contract:provider",
-    "gen:db-readme": "tsx scripts/gen-db-readme.ts",
     "check:apis": "node scripts/smoke-apis.mjs"
   },
   "keywords": [],
