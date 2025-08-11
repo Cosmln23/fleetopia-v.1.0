@@ -7,7 +7,7 @@
     "dev": "tsx --watch --import ./src/instrument.ts ./src/server.ts",
     "prebuild": "prisma generate",
     "build": "tsc -p tsconfig.json",
-    "start": "node --import ./dist/instrument.js dist/server.js",
+    "start": "node --input-type=module -e \"import('./dist/instrument.js').catch(()=>{}).then(()=>import('./dist/server.js'))\"",
     "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
