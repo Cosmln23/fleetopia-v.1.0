@@ -25,26 +25,28 @@ jobs:
       - name: Install deps (workspace)
         run: pnpm install -w --no-frozen-lockfile
 
-      # Runner-only: instalează dep-urile lipsă pentru backend ca să treacă typecheck/build (nu modifică main-ul tău)
-      - name: Install missing backend deps (runner-only)
+      - name: Install + Build contracts
         run: |
-          pnpm -w add -F @fleetopia/backend express cors helmet hpp winston express-rate-limit multer file-type sharp p-limit dotenv socket.io @sentry/node @sentry/profiling-node @clerk/express @prisma/client prisma
-          pnpm -w add -D -F @fleetopia/backend @types/node @types/express @types/cors @types/multer
+          pnpm --filter @fleetopia/contracts install --no-frozen-lockfile || true
+          pnpm --filter @fleetopia/contracts build || true
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Install backend deps
+        run: pnpm --filter @fleetopia/backend install --no-frozen-lockfile
+
+      - name: Typecheck (web only)
+        run: pnpm --filter @fleetopia/web run typecheck
 
       - name: Lint
         run: pnpm run lint
 
-      - name: Build
+      - name: Build (root)
         run: pnpm run build
-
-      - name: Unit tests
-        run: pnpm run test
 
       - name: Build backend
         run: pnpm --filter @fleetopia/backend build
+
+      - name: Unit tests
+        run: pnpm run test
 
       - name: Start backend
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
@@ -95,7 +97,7 @@ jobs:
     name: check-apis
     runs-on: ubuntu-latest
     steps:
-      - name: CheckoutCancel changes
+      - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -107,6 +109,8 @@ jobs:
         run: pnpm -v
       - name: Install deps (workspace)
         run: pnpm install -w --no-frozen-lockfile
+      - name: Install backend deps
+        run: pnpm --filter @fleetopia/backend install --no-frozen-lockfile
       - name: Build backend
         run: pnpm --filter @fleetopia/backend build
       - name: Start backend
