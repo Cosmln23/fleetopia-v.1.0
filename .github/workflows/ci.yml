@@ -50,6 +50,11 @@ jobs:
       - name: Start backend for provider verification
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
+      - name: Smoke API targets
+        run: pnpm check:apis
+        env:
+          API_BASE: http://localhost:3001
+
       - name: Contract tests - provider
         run: npm run contract:provider
         env:
