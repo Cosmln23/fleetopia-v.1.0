@@ -79,16 +79,8 @@ jobs:
             test-results
             pacts
             playwright-report
-name: CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build-and-test:
+  build-and-test-npm:
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2FjcmVkLW11ZGZpc2gtNC5jbGVyay5hY2NvdW50cy5kZXYk
@@ -125,5 +117,3 @@ jobs:
 
       - name: Build Storybook
         run: npm run build-storybook
-
-
