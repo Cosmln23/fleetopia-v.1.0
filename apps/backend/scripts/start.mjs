@@ -6,19 +6,32 @@ import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const distDir = resolve(process.cwd(), 'dist')
-const instrumentPath = resolve(distDir, 'instrument.js')
-const serverPath = resolve(distDir, 'server.js')
+const candidates = {
+  instrument: [
+    resolve(distDir, 'instrument.js'),
+    resolve(distDir, 'src', 'instrument.js'),
+  ],
+  server: [
+    resolve(distDir, 'server.js'),
+    resolve(distDir, 'src', 'server.js'),
+  ],
+}
 
-if (!existsSync(serverPath)) {
-  console.error('[start] Missing dist/server.js. Did you run: pnpm --filter @fleetopia/backend build ?')
+const pickFirstExisting = (paths) => paths.find((p) => existsSync(p))
+
+const instrumentPath = pickFirstExisting(candidates.instrument)
+const serverPath = pickFirstExisting(candidates.server)
+
+if (!serverPath) {
+  console.error('[start] Missing dist/server.js (or dist/src/server.js). Did you run: pnpm --filter @fleetopia/backend build ?')
   process.exit(1)
 }
 
-if (existsSync(instrumentPath)) {
+if (instrumentPath) {
   try {
     await import(pathToFileURL(instrumentPath).href)
   } catch (e) {
-    console.warn('[start] Failed to import dist/instrument.js (continuing):', e?.message || e)
+    console.warn('[start] Failed to import instrumentation (continuing):', e?.message || e)
   }
 }
 
