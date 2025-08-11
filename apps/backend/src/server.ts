@@ -10,8 +10,8 @@ import { apiLimiter } from './lib/rateLimit';
 import logger from './lib/logger';
 import { clerkMiddleware } from '@clerk/express';
 import dotenv from 'dotenv';
-
-dotenv.config({ path: '../.env' });
+// Load env from repo root if present; fallback to default resolution
+dotenv.config({ path: process.cwd() + '/.env' });
 
 // Routers
 import homeRouter from './routes/home';

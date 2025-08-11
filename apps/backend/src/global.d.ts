@@ -1,5 +1,11 @@
-import 'express-serve-static-core';
+import 'express';
 
-declare global {}
+declare global {
+  namespace Express {
+    interface Request {
+      context?: { requestId?: string };
+    }
+  }
+}
 
 

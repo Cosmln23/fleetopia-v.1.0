@@ -7,6 +7,8 @@ export const CargoSchema = z.object({
   type: z.string().optional(),
   weight: z.number().positive(),
   volume: z.number().positive().optional(),
+  vehicleType: z.string().optional(),
+  urgency: z.string().optional(),
   fromAddress: z.string().min(1),
   toAddress: z.string().min(1),
   totalPrice: z.number().nonnegative().optional(),

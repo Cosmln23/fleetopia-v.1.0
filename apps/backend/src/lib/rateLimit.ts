@@ -10,13 +10,14 @@ function isExempt(req: Request): boolean {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  if (exemptIps.length && exemptIps.includes(req.ip)) return true;
+  const ip = req.ip || '';
+  if (exemptIps.length && ip && exemptIps.includes(ip)) return true;
   const adminIds = (process.env.ADMIN_USER_IDS || '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
   const userId = (req as any).auth?.userId as string | undefined;
-  if (userId && adminIds.includes(userId)) return true;
+  if (typeof userId === 'string' && adminIds.includes(userId)) return true;
   return false;
 }
 
@@ -33,7 +34,11 @@ export function createApiLimiter() {
     standardHeaders: true,
     legacyHeaders: false,
     skip: isExempt,
-    keyGenerator: (req) => (req as any).auth?.userId || req.ip,
+    keyGenerator: (req: Request): string => {
+      const uid = (req as any).auth?.userId as string | undefined;
+      const ipAddr = req.ip || '0.0.0.0';
+      return typeof uid === 'string' && uid.length > 0 ? uid : ipAddr;
+    },
     handler: (req: Request, res: Response /*, next*/) => {
       const retryAfterSec = Math.ceil(windowMs / 1000);
       res.setHeader('X-RateLimit-Limit', String(max));
