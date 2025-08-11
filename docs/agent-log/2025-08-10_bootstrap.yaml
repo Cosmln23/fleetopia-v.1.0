@@ -1,0 +1,59 @@
+schema_version: 1
+date: 2025-08-10
+author: agent
+change_type: bootstrap
+migration_id: NA
+tables: [User, Cargo, Quote, Deal, ChatThread, ChatMessage, Vehicle, VehicleLocation, CostSettings, NotificationSettings, UserSettings]
+columns: []
+index_name: null
+policy_name: null
+role: null
+rationale: "Bootstrap snapshot of current DB state inferred from Prisma schema (no DB connection)."
+risk: low
+links:
+  pr_url: "NA"
+  migration_path: "NA"
+evidence:
+  before_ms: null
+  after_ms: null
+  explain_before: "NA"
+  explain_after: "NA"
+validation:
+  did_run_checks: true
+  notes: "Parsed apps/backend/prisma/schema.prisma; validated YAML format. No RLS/roles defined in code."
+multitenant:
+  enabled: false
+  tenant_key: "NA"
+security:
+  rls:
+    status: "off"
+    notes: "No RLS policies detected in Prisma/code."
+  roles: []
+data_quality:
+  pii:
+    - table: "User"
+      columns: ["email"]
+  retention:
+    - table: "ChatMessage"
+      policy: "90d"
+modeling:
+  fks:
+    - "Deal.cargoId -> Cargo.id"
+    - "Deal.quoteId -> Quote.id"
+    - "VehicleLocation.vehicleId -> Vehicle.id"
+  cascade:
+    - path: "Cargo -> Deal"
+      mode: "RESTRICT"
+performance:
+  critical_indexes:
+    - table: "VehicleLocation"
+      columns: ["vehicleId", "timestamp"]
+      rationale: "timeline per vehicle; fast latest position queries"
+  slow_query_threshold_ms: 500
+ops:
+  backups:
+    pit_recovery: true
+    retention_days: 7
+  replicas:
+    read_replica: "off"
+
