@@ -22,7 +22,7 @@ export default [
       "storybook-static/",
       "playwright-report/",
       // Scoatem codul server-side din lint deocamdată (conform CI)
-      "backend/**",
+      "apps/backend/**",
       "agent-core/**",
     ],
   },
@@ -96,6 +96,21 @@ export default [
     rules: {
       "no-undef": "off",
       "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+
+  // Node ESM scripts and config files (.mjs)
+  {
+    files: ["**/*.mjs", "scripts/**/*.{mjs}", "next.config.mjs"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: { ...globals.node, fetch: "readonly" },
+    },
+    rules: {
+      // ESM scripts folosesc globals Node (process, __dirname neexistent) și fetch (Node 18+)
+      // Evităm alertele false pentru variabile globale recunoscute de runtime
+      "no-undef": "off",
     },
   },
 
