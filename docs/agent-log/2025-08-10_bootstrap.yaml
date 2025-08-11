@@ -1,0 +1,23 @@
+date: 2025-08-10
+author: agent
+change_type: other
+migration_id: NA
+tables: [User, Cargo, Quote, Deal, ChatThread, ChatMessage, Vehicle, VehicleLocation, CostSettings, NotificationSettings, UserSettings]
+columns: []
+index_name: null
+policy_name: null
+role: null
+rationale: "Bootstrap snapshot of current DB state from Prisma schema; indexes/roles noted in validation"
+risk: low
+links:
+  pr_url: "NA"
+  migration_path: "NA"
+evidence:
+  before_ms: null
+  after_ms: null
+  explain_before: "NA"
+  explain_after: "NA"
+validation:
+  did_run_checks: true
+  notes: "Derived from apps/backend/prisma/schema.prisma. Unique constraints include: Deal.cargoId unique, Deal.quoteId unique, Vehicle @@unique(ownerId, licensePlate). Enums present for cargo/deal/message/vehicle statuses. No RLS/role policies defined in code; refine with prisma db pull when connected to DB."
+
