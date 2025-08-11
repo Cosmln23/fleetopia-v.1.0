@@ -8,12 +8,8 @@ on:
 
 jobs:
   build-and-test:
+    name: build-and-test
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -24,10 +20,20 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install pnpm (corepack)
+        run: corepack prepare pnpm@10.0.0 --activate
+
       - name: Setup pnpm
-        uses: pnpm/action-setup@2b58aa46cf4705e20b5a5ee482b550c7c65d5f98 # v3
+        uses: pnpm/action-setup@v4
         with:
           version: 10
+          standalone: true
+
+      - name: PNPM version
+        run: pnpm -v
 
       - name: Install
         run: pnpm -w install --frozen-lockfile
@@ -44,19 +50,19 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
-      - name: Contract tests - consumer
-        run: npm run contract:consumer
-
       - name: Start backend for provider verification
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
+      - name: Contract tests - consumer
+        run: pnpm run contract:consumer
+
       - name: Smoke API targets
-        run: pnpm check:apis
+        run: pnpm run check:apis
         env:
           API_BASE: http://localhost:3001
 
       - name: Contract tests - provider
-        run: npm run contract:provider
+        run: pnpm run contract:provider
         env:
           PROVIDER_BASE_URL: http://localhost:3001
 
@@ -70,60 +76,63 @@ jobs:
       - name: E2E tests
         run: pnpm run test:e2e
 
-      - name: Upload test artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
-        with:
-          name: test-artifacts
-          path: |
-            test-results
-            pacts
-            playwright-report
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  build-and-test:
+  validate-db-logs:
+    name: validate-db-logs
     runs-on: ubuntu-latest
-    env:
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2FjcmVkLW11ZGZpc2gtNC5jbGVyay5hY2NvdW50cy5kZXYk
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
         with:
-          node-version: '20.x'
-          cache: 'npm'
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Install pnpm (corepack)
+        run: corepack prepare pnpm@10.0.0 --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          standalone: true
+      - name: PNPM version
+        run: pnpm -v
+      - name: Install
+        run: pnpm -w install --frozen-lockfile
+      - name: Validate DB logs
+        run: pnpm run validate:db-logs
 
-      - name: Install (root)
-        run: npm ci --no-audit --no-fund
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test unitare (Jest)
-        run: npm run test
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Test E2E (Playwright)
-        run: npm run test:e2e
-
-      - name: Build Storybook
-        run: npm run build-storybook
-
-
+  check-apis:
+    name: check-apis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Install pnpm (corepack)
+        run: corepack prepare pnpm@10.0.0 --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          standalone: true
+      - name: PNPM version
+        run: pnpm -v
+      - name: Install
+        run: pnpm -w install --frozen-lockfile
+      - name: Start backend
+        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+      - name: Smoke API targets
+        run: pnpm run check:apis
+        env:
+          API_BASE: http://localhost:3001
+      - name: Stop backend
+        if: always()
+        run: pkill -f "dist/server.js" || true
