@@ -1,11 +1,15 @@
 // Robust start script for CI: try to import dist/instrument.js if present, then dist/server.js
 // Ensures ESM and clear error if dist not built.
 
-import { pathToFileURL } from 'node:url'
+import { pathToFileURL, fileURLToPath } from 'node:url'
 import { existsSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { resolve, dirname } from 'node:path'
 
-const distDir = resolve(process.cwd(), 'dist')
+// Resolve dist relative to this script's directory to avoid cwd issues in CI
+const thisFile = fileURLToPath(import.meta.url)
+const thisDir = dirname(thisFile)
+const backendDir = resolve(thisDir, '..')
+const distDir = resolve(backendDir, 'dist')
 const candidates = {
   instrument: [
     resolve(distDir, 'instrument.js'),
