@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from 'express';
+import { AllOffersResponseSchema } from '@fleetopia/contracts';
 import prisma from '../lib/prisma';
 
 const router = Router();
@@ -72,7 +73,10 @@ router.get('/marketplace/all-offers', async (req: Request, res: Response) => {
   }));
 
   const pages = Math.max(1, Math.ceil(total / limit));
-  res.json({ cargo: mapped, pagination: { total, pages, page, limit } });
+  const payload = { cargo: mapped, pagination: { total, pages, page, limit } };
+  const valid = AllOffersResponseSchema.safeParse(payload);
+  if (!valid.success) return res.status(500).json({ error: 'Schema mismatch', details: valid.error.flatten() });
+  res.json(payload);
 });
 
 router.get('/marketplace/my-cargo', async (req: Request, res: Response) => {

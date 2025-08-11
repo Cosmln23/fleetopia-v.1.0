@@ -1,21 +1,12 @@
 import { Router, type Request, type Response } from 'express';
 import { requireAuth } from '@clerk/express';
 import { z } from 'zod';
+import { CargoSchema } from '@fleetopia/contracts';
 import prisma from '../lib/prisma';
 
 const router = Router();
 
-const createSchema = z.object({
-  title: z.string().min(1),
-  type: z.string().optional(),
-  weight: z.number().positive(),
-  volume: z.number().optional(),
-  vehicleType: z.string().optional(),
-  urgency: z.string().optional(),
-  fromAddress: z.string().min(1),
-  toAddress: z.string().min(1),
-  totalPrice: z.number().nonnegative().optional(),
-});
+const createSchema = CargoSchema;
 
 router.post('/cargo/create', requireAuth(), async (req: Request, res: Response) => {
   const parsed = createSchema.safeParse(req.body);

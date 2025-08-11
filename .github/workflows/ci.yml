@@ -10,6 +10,82 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@2b58aa46cf4705e20b5a5ee482b550c7c65d5f98 # v3
+        with:
+          version: 10
+
+      - name: Install
+        run: pnpm -w install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Unit tests
+        run: pnpm run test
+
+      - name: Contract tests - consumer
+        run: npm run contract:consumer
+
+      - name: Start backend for provider verification
+        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+
+      - name: Contract tests - provider
+        run: npm run contract:provider
+        env:
+          PROVIDER_BASE_URL: http://localhost:3001
+
+      - name: Stop backend
+        if: always()
+        run: pkill -f "dist/server.js" || true
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: E2E tests
+        run: pnpm run test:e2e
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
+        with:
+          name: test-artifacts
+          path: |
+            test-results
+            pacts
+            playwright-report
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2FjcmVkLW11ZGZpc2gtNC5jbGVyay5hY2NvdW50cy5kZXYk
     steps:
       - name: Checkout

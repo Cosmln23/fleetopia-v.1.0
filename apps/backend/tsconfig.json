@@ -8,9 +8,11 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@fleetopia/contracts": ["../../packages/contracts/src/index.ts"]
+    }
   },
   "include": ["src", "prisma"]
 }
-
-
