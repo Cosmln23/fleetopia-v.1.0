@@ -4,6 +4,7 @@
     "module": "ES2022",
     "moduleResolution": "Bundler",
     "outDir": "dist",
+    "rootDir": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
@@ -11,7 +12,7 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@fleetopia/contracts": ["../../packages/contracts/src/index.ts"]
+      "@fleetopia/contracts": ["../../packages/contracts/dist/index.d.ts"]
     }
   },
   "include": ["src", "prisma"]
