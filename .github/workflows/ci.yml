@@ -18,16 +18,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          standalone: true
-          run_install: true
-          run_install_cwd: .
-          run_install_args: -w --frozen-lockfile
+      - name: Install pnpm (global)
+        run: npm i -g pnpm@10
+
+      - name: Verify pnpm
+        run: pnpm -v
+
+      - name: Install deps
+        run: pnpm install -w --frozen-lockfile
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -41,11 +40,16 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
+      - name: Start backend for provider verification
+        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+
       - name: Contract tests - consumer
         run: pnpm run contract:consumer
 
-      - name: Start backend for provider verification
-        run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+      - name: Smoke API targets
+        run: pnpm run check:apis
+        env:
+          API_BASE: http://localhost:3001
 
       - name: Contract tests - provider
         run: pnpm run contract:provider
@@ -73,16 +77,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          standalone: true
-          run_install: true
-          run_install_cwd: .
-          run_install_args: -w --frozen-lockfile
+      - name: Install pnpm (global)
+        run: npm i -g pnpm@10
+
+      - name: Verify pnpm
+        run: pnpm -v
+
+      - name: Install deps
+        run: pnpm install -w --frozen-lockfile
 
       - name: Validate DB logs
         run: pnpm run validate:db-logs
@@ -98,16 +101,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-          standalone: true
-          run_install: true
-          run_install_cwd: .
-          run_install_args: -w --frozen-lockfile
+      - name: Install pnpm (global)
+        run: npm i -g pnpm@10
+
+      - name: Verify pnpm
+        run: pnpm -v
+
+      - name: Install deps
+        run: pnpm install -w --frozen-lockfile
 
       - name: Start backend
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
