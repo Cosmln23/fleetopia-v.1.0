@@ -151,6 +151,42 @@ Oprește implementarea. Propune **2 opțiuni** cu pro/contra, spune ce informaț
 - Nu schimbi stack, stil sau arhitectură fără cerere explicită.
 
 ---
+## DB Change Log Rule (Prod)
+Scop: La orice schimbare ce atinge baza de date (schema, index, RLS/politici, roluri, chei de cache), agentul trebuie să producă un fișier YAML în `docs/agent-log/` și să-l atașeze PR-ului.
+
+Nume fișier: `docs/agent-log/YYYY-MM-DD_<change_type>_<slug>.yaml`
+
+Format YAML obligatoriu:
+```
+date: YYYY-MM-DD
+author: agent|dev
+change_type: table_add|table_alter|column_add|index_add|index_drop|rls_update|role_update|cache_key|replica_cfg|other
+migration_id: <string|NA>
+tables: [<table_a>, <table_b>]
+columns: [<col_a>, <col_b>]
+index_name: <string_or_null>
+policy_name: <string_or_null>
+role: <string_or_null>
+rationale: "<1-2 fraze>"
+risk: low|medium|high
+links:
+  pr_url: "<url|NA>"
+  migration_path: "apps/.../migrations/<id>"
+evidence:
+  before_ms: <numar_or_null>
+  after_ms: <numar_or_null>
+  explain_before: "<scurt|NA>"
+  explain_after: "<scurt|NA>"
+validation:
+  did_run_checks: true|false
+  notes: "<psql \d+, describe/indexes, RLS ON etc.>"
+```
+
+Reguli minim obligatorii:
+- fără secrete (chei, parole, DSN)
+- dacă `change_type=rls_update` → `policy_name` nu e null
+- dacă `change_type=index_add` → `index_name` și `tables` obligatorii
+- dacă lipsesc date, pune `NA` explicit și justifică în `rationale`
 REGULA #11 — Separare Frontend/Backend (Monorepo, UI protejat)
 
 Scop: Backend-ul evoluează independent. UI este intangibil până la aprobare explicită.

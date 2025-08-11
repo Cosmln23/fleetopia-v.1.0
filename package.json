@@ -20,6 +20,7 @@
     "dev:backend": "pnpm --filter @fleetopia/backend run dev",
     "start:backend": "pnpm --filter @fleetopia/backend run start",
     "migrate": "pnpm --filter @fleetopia/backend run migrate:deploy",
+    "gen:db-readme": "tsx scripts/gen-db-readme.ts",
     "contract:consumer": "jest __tests__/contracts --runTestsByPath __tests__/contracts/consumer.allOffers.pact.test.ts",
     "contract:provider": "jest __tests__/contracts --runTestsByPath __tests__/contracts/provider.verify.test.ts",
     "contract:test": "npm run contract:consumer && npm run contract:provider",
