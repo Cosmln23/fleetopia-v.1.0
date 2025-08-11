@@ -1,10 +1,7 @@
 name: CI
-
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  push: { branches: [ main ] }
+  pull_request: { branches: [ main ] }
 
 jobs:
   build-and-test:
@@ -25,8 +22,14 @@ jobs:
       - name: Verify pnpm
         run: pnpm -v
 
-      - name: Install deps
-        run: pnpm install -w --frozen-lockfile
+      - name: Install deps (workspace)
+        run: pnpm install -w --no-frozen-lockfile
+
+      # Runner-only: instalează dep-urile lipsă pentru backend ca să treacă typecheck/build (nu modifică main-ul tău)
+      - name: Install missing backend deps (runner-only)
+        run: |
+          pnpm -w add -F @fleetopia/backend express cors helmet hpp winston express-rate-limit multer file-type sharp p-limit dotenv socket.io @sentry/node @sentry/profiling-node @clerk/express @prisma/client prisma
+          pnpm -w add -D -F @fleetopia/backend @types/node @types/express @types/cors @types/multer
 
       - name: Typecheck
         run: pnpm run typecheck
@@ -40,7 +43,10 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
-      - name: Start backend for provider verification
+      - name: Build backend
+        run: pnpm --filter @fleetopia/backend build
+
+      - name: Start backend
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
       - name: Contract tests - consumer
@@ -72,21 +78,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install pnpm (global)
         run: npm i -g pnpm@10
-
       - name: Verify pnpm
         run: pnpm -v
-
-      - name: Install deps
-        run: pnpm install -w --frozen-lockfile
-
+      - name: Install deps (workspace)
+        run: pnpm install -w --no-frozen-lockfile
       - name: Validate DB logs
         run: pnpm run validate:db-logs
 
@@ -94,31 +95,26 @@ jobs:
     name: check-apis
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: CheckoutCancel changes
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install pnpm (global)
         run: npm i -g pnpm@10
-
       - name: Verify pnpm
         run: pnpm -v
-
-      - name: Install deps
-        run: pnpm install -w --frozen-lockfile
-
+      - name: Install deps (workspace)
+        run: pnpm install -w --no-frozen-lockfile
+      - name: Build backend
+        run: pnpm --filter @fleetopia/backend build
       - name: Start backend
         run: pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
-
       - name: Smoke API targets
         run: pnpm run check:apis
         env:
           API_BASE: http://localhost:3001
-
       - name: Stop backend
         if: always()
         run: pkill -f "dist/server.js" || true
