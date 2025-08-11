@@ -307,6 +307,12 @@ Interzis: app/**, components/**, public/**, styles/**, app/api/**, next.config.*
 - vechi
 + nou
 ```
+
+### API Smoke Targets Rule (Prod)
+- La orice endpoint nou/modificat, agentul adaugă/actualizează intrarea în `scripts/apis.json`.
+- Format: `{ name, method, path, expect:[statuses] }`.
+- Nume unic: `<segment>-<verbul>-<resursa>` (ex.: `cargo-create`).
+- În PR, dacă detectezi rute noi și lipsesc din `apis.json` → marchează PR-ul ca invalid și cere completarea.
 ✅ LOCAȚIA: `path/to/file.tsx` (Lxxx–Lyyy)
 
 🧪 TESTE:

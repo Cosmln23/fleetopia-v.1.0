@@ -1,0 +1,9 @@
+[
+  { "name": "health", "method": "GET", "path": "/health", "expect": [200] },
+  { "name": "offers", "method": "GET", "path": "/api/marketplace/all-offers?limit=1", "expect": [200] },
+  { "name": "home-data", "method": "GET", "path": "/api/home-data", "expect": [200] },
+  { "name": "my-cargo", "method": "GET", "path": "/api/marketplace/my-cargo", "expect": [200,401,403] },
+  { "name": "my-quotes", "method": "GET", "path": "/api/marketplace/my-quotes", "expect": [200,401,403] },
+  { "name": "active-deals", "method": "GET", "path": "/api/marketplace/active-deals", "expect": [200,401,403] }
+]
+
