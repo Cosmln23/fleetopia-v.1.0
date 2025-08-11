@@ -34,13 +34,18 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "store/**/*.ts",
+    "utils/**/*.ts",
+    "middleware.ts",
+    "instrumentation*.ts",
+    "sentry.*.config.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "backend/**",
+    "apps/backend/**",
     "agent-core/**",
     "**/*.test.ts",
     "**/*.test.tsx",
