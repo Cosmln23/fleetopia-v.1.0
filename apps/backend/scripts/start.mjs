@@ -14,10 +14,14 @@ const candidates = {
   instrument: [
     resolve(distDir, 'instrument.js'),
     resolve(distDir, 'src', 'instrument.js'),
+    // In CI, TS common root can be repo root → dist/apps/backend/src/...
+    resolve(distDir, 'apps', 'backend', 'src', 'instrument.js'),
   ],
   server: [
     resolve(distDir, 'server.js'),
     resolve(distDir, 'src', 'server.js'),
+    // In CI, TS common root can be repo root → dist/apps/backend/src/...
+    resolve(distDir, 'apps', 'backend', 'src', 'server.js'),
   ],
 }
 

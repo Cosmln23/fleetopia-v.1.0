@@ -62,7 +62,11 @@ jobs:
           echo "--- Inspecting filesystem after build (build-and-test) ---"
           ls -la apps/backend || true
           ls -la apps/backend/dist || true
+          ls -la dist || true
+          ls -la dist/apps/backend || true
+          ls -la dist/apps/backend/src || true
           find apps/backend -maxdepth 3 -type f -name "*.js" -ls || true
+          find dist -maxdepth 5 -type f -name "server.js" -ls || true
           echo "--- End of inspection ---"
           # Start backend and wait for health
           pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
@@ -138,7 +142,11 @@ jobs:
           echo "--- Inspecting filesystem after build (check-apis) ---"
           ls -la apps/backend || true
           ls -la apps/backend/dist || true
+          ls -la dist || true
+          ls -la dist/apps/backend || true
+          ls -la dist/apps/backend/src || true
           find apps/backend -maxdepth 3 -type f -name "*.js" -ls || true
+          find dist -maxdepth 5 -type f -name "server.js" -ls || true
           echo "--- End of inspection ---"
           PORT=3002 pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3002/health
       - name: Smoke API targets
