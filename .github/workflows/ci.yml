@@ -55,8 +55,17 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
-      - name: Start backend
-        run: pnpm --filter '@fleetopia/backend...' build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+      - name: Start backend (diag + start)
+        run: |
+          # Ensure build is done and inspect filesystem
+          pnpm --filter '@fleetopia/backend...' build
+          echo "--- Inspecting filesystem after build (build-and-test) ---"
+          ls -la apps/backend || true
+          ls -la apps/backend/dist || true
+          find apps/backend -maxdepth 3 -type f -name "*.js" -ls || true
+          echo "--- End of inspection ---"
+          # Start backend and wait for health
+          pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
       - name: Contract tests - consumer
         run: pnpm run contract:consumer
@@ -123,12 +132,19 @@ jobs:
         run: pnpm --filter @fleetopia/backend install --no-frozen-lockfile
       - name: Build backend (with deps)
         run: pnpm --filter '@fleetopia/backend...' build
-      - name: Start backend
-        run: pnpm --filter '@fleetopia/backend...' build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+      - name: Start backend (diag + start on port 3002)
+        run: |
+          pnpm --filter '@fleetopia/backend...' build
+          echo "--- Inspecting filesystem after build (check-apis) ---"
+          ls -la apps/backend || true
+          ls -la apps/backend/dist || true
+          find apps/backend -maxdepth 3 -type f -name "*.js" -ls || true
+          echo "--- End of inspection ---"
+          PORT=3002 pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3002/health
       - name: Smoke API targets
         run: pnpm run check:apis
         env:
-          API_BASE: http://localhost:3001
+          API_BASE: http://localhost:3002
       - name: Stop backend
         if: always()
         run: pkill -f "dist/server.js" || true
