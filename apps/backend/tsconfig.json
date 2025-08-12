@@ -10,10 +10,10 @@
     "skipLibCheck": true,
     "strict": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@fleetopia/contracts": ["../../packages/contracts/src/index.ts"]
-    }
+    "baseUrl": "."
   },
-  "include": ["src", "prisma"]
+  "include": ["src", "prisma"],
+  "references": [
+    { "path": "../../packages/contracts" }
+  ]
 }
