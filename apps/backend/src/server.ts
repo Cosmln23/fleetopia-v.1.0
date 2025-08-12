@@ -1,29 +1,29 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import hpp from 'hpp';
-import * as Sentry from '@sentry/node';
-import { requestIdMiddleware } from './middleware/requestId.js';
-import { createServer } from 'http';
-import { createSocketServer } from './ws/index.js';
-import { apiLimiter } from './lib/rateLimit.js';
-import logger from './lib/logger.js';
-import { clerkMiddleware } from '@clerk/express';
-import dotenv from 'dotenv';
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const hpp = require('hpp');
+const Sentry = require('@sentry/node');
+const { requestIdMiddleware } = require('./middleware/requestId');
+const { createServer } = require('http');
+const { createSocketServer } = require('./ws/index');
+const { apiLimiter } = require('./lib/rateLimit');
+const logger = require('./lib/logger').default || require('./lib/logger');
+const { clerkMiddleware } = require('@clerk/express');
+const dotenv = require('dotenv');
 // Load env from repo root if present; fallback to default resolution
 dotenv.config({ path: process.cwd() + '/.env' });
 
 // Routers
-import homeRouter from './routes/home.js';
-import marketplaceRouter from './routes/marketplace.js';
-import cargoRouter from './routes/cargo.js';
-import quotesRouter from './routes/quotes.js';
-import dealsRouter from './routes/deals.js';
-import agentRouter from './routes/agent.js';
-import fleetRouter from './routes/fleet.js';
-import settingsRouter from './routes/settings.js';
-import loadsRouter from './routes/loads.js';
-import uploadRouter from './routes/upload.js';
+const homeRouter = require('./routes/home').default || require('./routes/home');
+const marketplaceRouter = require('./routes/marketplace').default || require('./routes/marketplace');
+const cargoRouter = require('./routes/cargo').default || require('./routes/cargo');
+const quotesRouter = require('./routes/quotes').default || require('./routes/quotes');
+const dealsRouter = require('./routes/deals').default || require('./routes/deals');
+const agentRouter = require('./routes/agent').default || require('./routes/agent');
+const fleetRouter = require('./routes/fleet').default || require('./routes/fleet');
+const settingsRouter = require('./routes/settings').default || require('./routes/settings');
+const loadsRouter = require('./routes/loads').default || require('./routes/loads');
+const uploadRouter = require('./routes/upload').default || require('./routes/upload');
 
 const app = express();
 

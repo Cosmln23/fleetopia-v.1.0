@@ -7,7 +7,7 @@
     "dev": "tsx --watch --import ./src/instrument.ts ./src/server.ts",
     "prebuild": "prisma generate",
     "build": "tsc -p tsconfig.json",
-    "start": "node --experimental-specifier-resolution=node ./scripts/start.mjs",
+    "start": "node dist/src/server.js",
     "migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
