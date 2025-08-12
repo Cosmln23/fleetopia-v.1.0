@@ -4,7 +4,7 @@
     "outDir": "dist",
     "declaration": true,
     "emitDeclarationOnly": false,
-    "composite": false,
+    "composite": true,
     "rootDir": "src",
     "module": "ES2022",
     "moduleResolution": "Bundler",
