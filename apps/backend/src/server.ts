@@ -3,27 +3,27 @@ import cors from 'cors';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import * as Sentry from '@sentry/node';
-import { requestIdMiddleware } from './middleware/requestId';
+import { requestIdMiddleware } from './middleware/requestId.js';
 import { createServer } from 'http';
-import { createSocketServer } from './ws/index';
-import { apiLimiter } from './lib/rateLimit';
-import logger from './lib/logger';
+import { createSocketServer } from './ws/index.js';
+import { apiLimiter } from './lib/rateLimit.js';
+import logger from './lib/logger.js';
 import { clerkMiddleware } from '@clerk/express';
 import dotenv from 'dotenv';
 // Load env from repo root if present; fallback to default resolution
 dotenv.config({ path: process.cwd() + '/.env' });
 
 // Routers
-import homeRouter from './routes/home';
-import marketplaceRouter from './routes/marketplace';
-import cargoRouter from './routes/cargo';
-import quotesRouter from './routes/quotes';
-import dealsRouter from './routes/deals';
-import agentRouter from './routes/agent';
-import fleetRouter from './routes/fleet';
-import settingsRouter from './routes/settings';
-import loadsRouter from './routes/loads';
-import uploadRouter from './routes/upload';
+import homeRouter from './routes/home.js';
+import marketplaceRouter from './routes/marketplace.js';
+import cargoRouter from './routes/cargo.js';
+import quotesRouter from './routes/quotes.js';
+import dealsRouter from './routes/deals.js';
+import agentRouter from './routes/agent.js';
+import fleetRouter from './routes/fleet.js';
+import settingsRouter from './routes/settings.js';
+import loadsRouter from './routes/loads.js';
+import uploadRouter from './routes/upload.js';
 
 const app = express();
 
