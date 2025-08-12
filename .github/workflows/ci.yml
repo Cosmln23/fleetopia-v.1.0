@@ -49,14 +49,14 @@ jobs:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_SENTRY_DSN_FRONTEND: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_FRONTEND }}
 
-      - name: Build backend
-        run: pnpm --filter @fleetopia/backend build
+      - name: Build backend (with deps)
+        run: pnpm --filter '@fleetopia/backend...' build
 
       - name: Unit tests
         run: pnpm run test
 
       - name: Start backend
-        run: pnpm --filter @fleetopia/backend build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+        run: pnpm --filter '@fleetopia/backend...' build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
 
       - name: Contract tests - consumer
         run: pnpm run contract:consumer
@@ -121,10 +121,10 @@ jobs:
         run: pnpm install -w --no-frozen-lockfile
       - name: Install backend deps
         run: pnpm --filter @fleetopia/backend install --no-frozen-lockfile
-      - name: Build backend
-        run: pnpm --filter @fleetopia/backend build
+      - name: Build backend (with deps)
+        run: pnpm --filter '@fleetopia/backend...' build
       - name: Start backend
-        run: pnpm --filter @fleetopia/backend build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
+        run: pnpm --filter '@fleetopia/backend...' build && pnpm --filter @fleetopia/backend start & npx wait-on -t 120000 http://localhost:3001/health
       - name: Smoke API targets
         run: pnpm run check:apis
         env:
